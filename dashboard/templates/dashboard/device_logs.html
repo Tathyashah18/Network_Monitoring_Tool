@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Device Logs</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #f1f5f9;
+        }
+
+        .online {
+            color: green;
+            font-weight: bold;
+        }
+
+        .offline {
+            color: red;
+            font-weight: bold;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #2563eb;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <a
+        href="{% url 'dashboard' %}"
+        class="back"
+    >
+        ← Back to Dashboard
+    </a>
+
+    <h1>
+        Device Logs
+    </h1>
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>
+                    IP Address
+                </th>
+
+                <th>
+                    Status
+                </th>
+
+                <th>
+                    Timestamp
+                </th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for log in logs %}
+
+                <tr>
+
+                    <td>
+                        {{ log.device.ip_address }}
+                    </td>
+
+                    <td>
+
+                        {% if log.status == "Online" %}
+
+                            <span class="online">
+                                Online
+                            </span>
+
+                        {% else %}
+
+                            <span class="offline">
+                                Offline
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        {{ log.timestamp }}
+                    </td>
+
+                </tr>
+
+            {% empty %}
+
+                <tr>
+
+                    <td colspan="3">
+                        No logs available.
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+</body>
+
+</html>

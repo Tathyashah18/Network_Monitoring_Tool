@@ -1,0 +1,566 @@
+/* ============================
+Network Monitoring Dashboard
+============================ */
+
+/* ============================
+Global
+============================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+  }
+
+body {
+background: #f5f7fa;
+color: #1f2937;
+}
+
+.container {
+width: 95%;
+max-width: 1400px;
+margin: auto;
+padding: 20px;
+}
+
+/* ============================
+Heading
+============================ */
+
+h1 {
+text-align: center;
+margin-bottom: 10px;
+color: #1f2937;
+font-size: 32px;
+}
+
+#current-time {
+text-align: center;
+margin-bottom: 20px;
+font-size: 18px;
+color: #555;
+}
+
+/* ============================
+Scan Network Button
+============================ */
+
+.scan-btn {
+display: block;
+
+ 
+margin: 15px auto 25px auto;
+
+padding: 12px 30px;
+
+background: #2563eb;
+color: white;
+
+border: none;
+border-radius: 8px;
+
+font-size: 16px;
+font-weight: 600;
+
+cursor: pointer;
+
+box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+
+transition:
+    background 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+ 
+
+}
+
+.scan-btn:hover {
+background: #1d4ed8;
+
+ 
+transform: translateY(-2px);
+
+box-shadow:
+    0 6px 14px rgba(37, 99, 235, 0.35);
+ 
+
+}
+
+.scan-btn:active {
+transform: translateY(0);
+
+ 
+box-shadow:
+    0 3px 7px rgba(37, 99, 235, 0.25);
+ 
+
+}
+
+.scan-btn:focus {
+outline: none;
+
+ 
+box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.2),
+    0 4px 10px rgba(37, 99, 235, 0.25);
+ 
+
+}
+
+/* ============================
+Django Messages
+============================ */
+
+.message {
+width: fit-content;
+
+ 
+margin: 0 auto 25px auto;
+
+padding: 10px 20px;
+
+border-radius: 7px;
+
+background: #ecfdf5;
+color: #047857;
+
+border: 1px solid #a7f3d0;
+
+font-size: 14px;
+font-weight: 500;
+ 
+
+}
+
+/* ============================
+Summary Cards
+============================ */
+
+.summary {
+display: flex;
+justify-content: center;
+
+ 
+gap: 20px;
+
+flex-wrap: wrap;
+
+margin-bottom: 30px;
+ 
+
+}
+
+.summary-card {
+width: 220px;
+
+ 
+padding: 20px;
+
+border-radius: 12px;
+
+color: white;
+
+text-align: center;
+
+box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.2);
+
+transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+ 
+
+}
+
+.summary-card:hover {
+transform: translateY(-3px);
+
+ 
+box-shadow:
+    0 7px 15px rgba(0, 0, 0, 0.2);
+ 
+
+}
+
+.summary-card h2 {
+margin-bottom: 10px;
+
+ 
+font-size: 22px;
+ 
+
+}
+
+.summary-card p {
+font-size: 32px;
+
+ 
+font-weight: bold;
+ 
+
+}
+
+/* Total */
+
+.total {
+background: #2563eb;
+}
+
+/* Online */
+
+.online {
+background: #16a34a;
+}
+
+/* Offline */
+
+.offline {
+background: #dc2626;
+}
+
+/* ============================
+Search Box
+============================ */
+
+#search {
+width: 100%;
+
+ 
+max-width: 400px;
+
+display: block;
+
+margin: 0 auto 30px auto;
+
+padding: 12px 15px;
+
+border-radius: 8px;
+
+border: 1px solid #ccc;
+
+background: white;
+
+font-size: 16px;
+
+outline: none;
+
+transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+ 
+
+}
+
+#search:focus {
+border-color: #2563eb;
+
+ 
+box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.15);
+ 
+
+}
+
+/* ============================
+Device Grid
+============================ */
+
+.device-grid {
+display: grid;
+
+ 
+grid-template-columns:
+    repeat(auto-fit, minmax(260px, 1fr));
+
+gap: 20px;
+ 
+
+}
+
+/* ============================
+Device Links
+============================ */
+
+/*
+The entire device card is clickable.
+Remove browser's default underline
+and link color.
+*/
+
+.device-link {
+display: block;
+
+ 
+text-decoration: none !important;
+
+color: inherit !important;
+ 
+
+}
+
+.device-link:visited {
+text-decoration: none !important;
+
+ 
+color: inherit !important;
+ 
+
+}
+
+.device-link:hover {
+text-decoration: none !important;
+
+ 
+color: inherit !important;
+ 
+
+}
+
+.device-link:active {
+text-decoration: none !important;
+
+ 
+color: inherit !important;
+ 
+
+}
+
+.device-link:focus {
+text-decoration: none !important;
+
+ 
+color: inherit !important;
+ 
+
+}
+
+.device-link * {
+text-decoration: none !important;
+}
+
+/* ============================
+Device Cards
+============================ */
+
+.device-card {
+border-radius: 12px;
+
+ 
+padding: 20px;
+
+color: white;
+
+box-shadow:
+    0 5px 12px rgba(0, 0, 0, 0.2);
+
+transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+ 
+
+}
+
+.device-card:hover {
+transform: translateY(-4px);
+
+ 
+box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.25);
+ 
+
+}
+
+/* Online Device */
+
+.online-card {
+background: #22c55e;
+}
+
+/* Offline Device */
+
+.offline-card {
+background: #ef4444;
+}
+
+.device-card h2 {
+margin-bottom: 15px;
+
+ 
+font-size: 22px;
+ 
+
+}
+
+.device-card p {
+margin: 8px 0;
+
+ 
+font-size: 15px;
+
+line-height: 1.4;
+ 
+
+}
+
+/* ============================
+Device Logs Button
+============================ */
+
+.logs-btn {
+display: block;
+
+ 
+width: fit-content;
+
+margin: 30px auto 10px auto;
+
+padding: 12px 25px;
+
+background: #2563eb;
+
+color: white;
+
+text-decoration: none;
+
+border-radius: 8px;
+
+font-size: 16px;
+
+font-weight: 600;
+
+box-shadow:
+    0 4px 10px rgba(37, 99, 235, 0.2);
+
+transition:
+    background 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+ 
+
+}
+
+.logs-btn:hover {
+background: #1d4ed8;
+
+ 
+transform: translateY(-2px);
+
+box-shadow:
+    0 6px 14px rgba(37, 99, 235, 0.3);
+ 
+
+}
+
+.logs-btn:active {
+transform: translateY(0);
+}
+
+/* ============================
+Responsive
+============================ */
+
+@media (max-width: 768px) {
+
+ 
+.container {
+    width: 100%;
+
+    padding: 15px;
+}
+
+
+h1 {
+    font-size: 26px;
+}
+
+
+#current-time {
+    font-size: 16px;
+}
+
+
+.summary {
+    flex-direction: column;
+
+    align-items: center;
+}
+
+
+.summary-card {
+    width: 90%;
+
+    max-width: 350px;
+}
+
+
+.device-grid {
+    grid-template-columns: 1fr;
+}
+
+
+.scan-btn {
+    width: 90%;
+
+    max-width: 300px;
+}
+
+
+#search {
+    max-width: 90%;
+}
+
+
+}
+
+/* ============================
+Small Mobile Screens
+============================ */
+
+@media (max-width: 480px) {
+
+ 
+h1 {
+    font-size: 22px;
+}
+
+
+.summary-card {
+    padding: 16px;
+}
+
+
+.summary-card h2 {
+    font-size: 19px;
+}
+
+
+.summary-card p {
+    font-size: 28px;
+}
+
+
+.device-card {
+    padding: 16px;
+}
+
+
+.device-card h2 {
+    font-size: 19px;
+}
+
+
+.device-card p {
+    font-size: 14px;
+}
+
+
+.scan-btn {
+    font-size: 15px;
+
+    padding: 11px 24px;
+}
+
+
+}

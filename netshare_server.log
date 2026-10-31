@@ -1,0 +1,370 @@
+
+======================================================================
+Remote server launched by Django
+Python      : C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\python.exe
+Server      : C:\Users\tithi\OneDrive\Desktop\Tathya\NMS3\server.py
+Working dir : C:\Users\tithi\OneDrive\Desktop\Tathya\NMS3
+Requested IP: 192.168.1.105
+======================================================================
+PID         : 63096
+server.py process started.
+================================================================
+NetShare WebSocket server listening on 0.0.0.0:8765
+Put ONE of these into agent.py's SERVER_HOST:
+[warn] health server on 8766: [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8766): only one usage of each socket address (protocol/network address/port) is normally permitted
+    192.168.1.103
+    192.168.56.1
+================================================================
+[FATAL] Cannot bind 0.0.0.0:8765 — [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8765): only one usage of each socket address (protocol/network address/port) is normally permitted
+        Something else is on 8765. Change PORT in both files.
+
+======================================================================
+Remote server launched by Django
+Python      : C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\python.exe
+Server      : C:\Users\tithi\OneDrive\Desktop\Tathya\NMS3\server.py
+Working dir : C:\Users\tithi\OneDrive\Desktop\Tathya\NMS3
+Requested IP: 192.168.1.105
+======================================================================
+PID         : 59044
+server.py process started.
+================================================================
+NetShare WebSocket server listening on 0.0.0.0:8765
+Put ONE of these into agent.py's SERVER_HOST:
+[warn] health server on 8766: [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8766): only one usage of each socket address (protocol/network address/port) is normally permitted
+    192.168.1.103
+    192.168.56.1
+================================================================
+[FATAL] Cannot bind 0.0.0.0:8765 — [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8765): only one usage of each socket address (protocol/network address/port) is normally permitted
+        Something else is on 8765. Change PORT in both files.
+
+======================================================================
+Remote server launched by Django
+Python      : C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\python.exe
+Server      : C:\Users\tithi\OneDrive\Desktop\Tathya\NMS3\server.py
+Working dir : C:\Users\tithi\OneDrive\Desktop\Tathya\NMS3
+Requested IP: 192.168.1.105
+======================================================================
+PID         : 61968
+server.py process started.
+================================================================
+NetShare WebSocket server listening on 0.0.0.0:8765
+Put ONE of these into agent.py's SERVER_HOST:
+[warn] health server on 8766: [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8766): only one usage of each socket address (protocol/network address/port) is normally permitted
+    192.168.1.103
+    192.168.56.1
+================================================================
+[FATAL] Cannot bind 0.0.0.0:8765 — [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8765): only one usage of each socket address (protocol/network address/port) is normally permitted
+        Something else is on 8765. Change PORT in both files.
+
+======================================================================
+Remote server launched by Django
+Python      : C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\python.exe
+Server      : C:\Users\tithi\OneDrive\Desktop\Tathya\NMS3\server.py
+Working dir : C:\Users\tithi\OneDrive\Desktop\Tathya\NMS3
+Requested IP: 192.168.1.105
+======================================================================
+PID         : 54012
+server.py process started.
+================================================================
+NetShare WebSocket server listening on 0.0.0.0:8765
+Put ONE of these into agent.py's SERVER_HOST:
+[warn] health server on 8766: [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8766): only one usage of each socket address (protocol/network address/port) is normally permitted
+    192.168.1.103
+    192.168.56.1
+================================================================
+[FATAL] Cannot bind 0.0.0.0:8765 — [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8765): only one usage of each socket address (protocol/network address/port) is normally permitted
+        Something else is on 8765. Change PORT in both files.
+
+======================================================================
+Remote server launched by Django
+Python      : C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\python.exe
+Server      : C:\Users\tithi\OneDrive\Desktop\Tathya\NMS3\server.py
+Working dir : C:\Users\tithi\OneDrive\Desktop\Tathya\NMS3
+Requested IP: 192.168.1.105
+======================================================================
+PID         : 67824
+server.py process started.
+================================================================
+NetShare WebSocket server listening on 0.0.0.0:8765
+Put ONE of these into agent.py's SERVER_HOST:
+Health endpoint listening on http://0.0.0.0:8766/ping
+    192.168.1.103
+    192.168.56.1
+================================================================
+[+] DEEP (192.168.1.105) connected
+[-] DEEP disconnected
+
+======================================================================
+Remote server launched by Django
+Python      : C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\python.exe
+Server      : C:\Users\tithi\OneDrive\Desktop\Tathya\NMS3\server.py
+Working dir : C:\Users\tithi\OneDrive\Desktop\Tathya\NMS3
+Requested IP: 192.168.1.105
+======================================================================
+PID         : 72228
+server.py process started.
+[17:49:49] ============================================================
+[17:49:49] NetShare WS server listening 0.0.0.0:8765
+[17:49:49] Put one of these into agent.py SERVER_HOST:
+[17:49:51]     192.168.1.103
+[17:49:51]     192.168.56.1
+[17:49:51] ============================================================
+opening handshake failed
+Traceback (most recent call last):
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\http11.py", line 138, in parse
+    request_line = yield from parse_line(read_line)
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\http11.py", line 309, in parse_line
+    line = yield from read_line(MAX_LINE_LENGTH)
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\streams.py", line 46, in read_line
+    raise EOFError(f"stream ends after {p} bytes, before end of line")
+EOFError: stream ends after 0 bytes, before end of line
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\server.py", line 545, in parse
+    request = yield from Request.parse(
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\http11.py", line 140, in parse
+    raise EOFError("connection closed while reading HTTP request line") from exc
+EOFError: connection closed while reading HTTP request line
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\asyncio\server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\asyncio\server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+websockets.exceptions.InvalidMessage: did not receive a valid HTTP request
+[17:51:19] [+] DEEP (192.168.1.105) connected control=YES 1920x1080
+[17:51:23] [CTRL] requested control
+[17:51:26] [CTRL] DEEP control now True
+[17:51:54] [CTRL] local control_mode = True
+[17:52:06] [17:52:06] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:06] [17:52:06] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:06] [17:52:06] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:06] [17:52:06] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:08] [17:52:08] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:08] [17:52:08] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:08] [17:52:08] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:08] [17:52:08] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:12] [17:52:12] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:12] [17:52:12] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:12] [17:52:12] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:12] [17:52:12] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:16] [17:52:16] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:16] [17:52:16] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:17] [17:52:17] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:17] [17:52:17] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:17] [CTRL] DEEP control now False
+[17:52:18] [CTRL] DEEP has NOT granted control
+[17:52:18] [CTRL] DEEP has NOT granted control
+[17:52:18] [CTRL] DEEP has NOT granted control
+[17:52:18] [CTRL] DEEP has NOT granted control
+[17:52:30] [CTRL] requested control
+[17:52:32] [CTRL] DEEP control now True
+[17:52:33] [CTRL] local control_mode = True
+[17:52:36] [17:52:36] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:36] [17:52:36] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:38] [17:52:38] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:38] [17:52:38] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:38] [17:52:38] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:38] [CTRL] DEEP control now False
+[17:52:45] [CTRL] requested control
+[17:52:47] [CTRL] DEEP control now True
+[17:52:48] [CTRL] local control_mode = True
+[17:52:49] [17:52:49] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:50] [17:52:50] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:50] [17:52:50] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[17:52:50] [-] DEEP disconnected
+[17:52:50] [CTRL] no agent selected
+[17:52:50] [CTRL] no agent selected
+
+======================================================================
+Remote server launched by Django
+Python      : C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\python.exe
+Server      : C:\Users\tithi\OneDrive\Desktop\Tathya\NMS3\server.py
+Working dir : C:\Users\tithi\OneDrive\Desktop\Tathya\NMS3
+Requested IP: 192.168.1.105
+======================================================================
+PID         : 73316
+server.py process started.
+[18:06:46] ============================================================
+[18:06:46] NetShare WS server listening 0.0.0.0:8765
+[18:06:46] Put one of these into agent.py SERVER_HOST:
+[18:06:46]     192.168.1.103
+[18:06:46]     192.168.56.1
+[18:06:46] ============================================================
+opening handshake failed
+Traceback (most recent call last):
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\http11.py", line 138, in parse
+    request_line = yield from parse_line(read_line)
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\http11.py", line 309, in parse_line
+    line = yield from read_line(MAX_LINE_LENGTH)
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\streams.py", line 46, in read_line
+    raise EOFError(f"stream ends after {p} bytes, before end of line")
+EOFError: stream ends after 0 bytes, before end of line
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\server.py", line 545, in parse
+    request = yield from Request.parse(
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\http11.py", line 140, in parse
+    raise EOFError("connection closed while reading HTTP request line") from exc
+EOFError: connection closed while reading HTTP request line
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\asyncio\server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\asyncio\server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+websockets.exceptions.InvalidMessage: did not receive a valid HTTP request
+[18:07:44] [+] DEEP (192.168.1.105) connected control=YES 1920x1080
+[18:07:50] [CTRL] requested control
+[18:07:52] [CTRL] DEEP control now True
+[18:07:53] [CTRL] local control_mode = True
+[18:07:55] [18:07:55] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[18:07:55] [18:07:55] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[18:07:55] [18:07:55] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[18:07:55] [-] DEEP disconnected
+[18:07:55] [CTRL] no agent selected
+[18:07:55] [CTRL] no agent selected
+
+======================================================================
+Remote server launched by Django
+Python      : C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\python.exe
+Server      : C:\Users\tithi\OneDrive\Desktop\Tathya\NMS3\server.py
+Working dir : C:\Users\tithi\OneDrive\Desktop\Tathya\NMS3
+Requested IP: 172.20.10.12
+======================================================================
+PID         : 92140
+server.py process started.
+[09:45:21] ============================================================
+[09:45:21] NetShare WS server listening 0.0.0.0:8765
+[09:45:21] Put one of these into agent.py SERVER_HOST:
+[09:45:21]     172.20.10.12
+[09:45:21]     192.168.56.1
+[09:45:21] ============================================================
+opening handshake failed
+Traceback (most recent call last):
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\http11.py", line 138, in parse
+    request_line = yield from parse_line(read_line)
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\http11.py", line 309, in parse_line
+    line = yield from read_line(MAX_LINE_LENGTH)
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\streams.py", line 46, in read_line
+    raise EOFError(f"stream ends after {p} bytes, before end of line")
+EOFError: stream ends after 0 bytes, before end of line
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\server.py", line 545, in parse
+    request = yield from Request.parse(
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\http11.py", line 140, in parse
+    raise EOFError("connection closed while reading HTTP request line") from exc
+EOFError: connection closed while reading HTTP request line
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\asyncio\server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\asyncio\server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+websockets.exceptions.InvalidMessage: did not receive a valid HTTP request
+[09:45:34] [+] shrey (172.20.10.3) connected control=YES 1920x1080
+[09:45:48] [CTRL] local control_mode = True
+[09:45:51] [09:45:51] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[09:45:51] [09:45:51] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[09:45:53] [09:45:53] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[09:45:53] [09:45:53] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[09:47:13] [09:47:13] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[09:47:13] [09:47:13] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[09:47:14] [-] shrey disconnected
+opening handshake failed
+Traceback (most recent call last):
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\http11.py", line 138, in parse
+    request_line = yield from parse_line(read_line)
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\http11.py", line 309, in parse_line
+    line = yield from read_line(MAX_LINE_LENGTH)
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\streams.py", line 46, in read_line
+    raise EOFError(f"stream ends after {p} bytes, before end of line")
+EOFError: stream ends after 0 bytes, before end of line
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\server.py", line 545, in parse
+    request = yield from Request.parse(
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\http11.py", line 140, in parse
+    raise EOFError("connection closed while reading HTTP request line") from exc
+EOFError: connection closed while reading HTTP request line
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\asyncio\server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\asyncio\server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+websockets.exceptions.InvalidMessage: did not receive a valid HTTP request
+
+======================================================================
+Remote server launched by Django
+Python      : C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\python.exe
+Server      : C:\Users\tithi\OneDrive\Desktop\Tathya\NMS3\server.py
+Working dir : C:\Users\tithi\OneDrive\Desktop\Tathya\NMS3
+Requested IP: 172.20.10.2
+======================================================================
+PID         : 100216
+server.py process started.
+[11:20:22] ============================================================
+[11:20:22] NetShare WS server listening 0.0.0.0:8765
+[11:20:22] Put one of these into agent.py SERVER_HOST:
+[11:20:23]     172.20.10.12
+[11:20:23]     192.168.56.1
+[11:20:23] ============================================================
+opening handshake failed
+Traceback (most recent call last):
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\http11.py", line 138, in parse
+    request_line = yield from parse_line(read_line)
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\http11.py", line 309, in parse_line
+    line = yield from read_line(MAX_LINE_LENGTH)
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\streams.py", line 46, in read_line
+    raise EOFError(f"stream ends after {p} bytes, before end of line")
+EOFError: stream ends after 0 bytes, before end of line
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\server.py", line 545, in parse
+    request = yield from Request.parse(
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\http11.py", line 140, in parse
+    raise EOFError("connection closed while reading HTTP request line") from exc
+EOFError: connection closed while reading HTTP request line
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\asyncio\server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "C:\Users\tithi\AppData\Local\Programs\Python\Python39-32\lib\site-packages\websockets\asyncio\server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+websockets.exceptions.InvalidMessage: did not receive a valid HTTP request
+[11:20:30] [+] DEEP (172.20.10.2) connected control=YES 1920x1080
+[11:21:03] [CTRL] local control_mode = True
+[11:21:03] [CTRL] local control_mode = False
+[11:21:04] [CTRL] local control_mode = True
+[11:21:06] [11:21:06] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[11:21:06] [11:21:06] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[11:21:10] [11:21:10] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[11:21:10] [11:21:10] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[11:21:14] [11:21:14] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[11:21:14] [11:21:14] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[11:21:14] [11:21:14] [CTRL] send fail: 'charmap' codec can't encode character '\u2192' in position 5: character maps to <undefined>
+[11:21:14] [-] DEEP disconnected
+[11:21:14] [CTRL] no agent selected
+[11:21:14] [CTRL] no agent selected

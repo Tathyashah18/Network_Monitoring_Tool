@@ -1,0 +1,4173 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Device Details - {{ device.ip_address }}</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    padding:0;
+    font-family:Arial,sans-serif;
+    background:#f4f6f9;
+    color:#222;
+}
+
+.container{
+    width:95%;
+    max-width:1400px;
+    margin:30px auto;
+}
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+    gap:15px;
+    flex-wrap:wrap;
+}
+
+.header h1{
+    margin:0;
+    font-size:30px;
+}
+
+.header-actions{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    flex-wrap:wrap;
+}
+
+.back-button,
+.topology-button{
+    border:none;
+    text-decoration:none;
+    color:white;
+    padding:11px 18px;
+    border-radius:6px;
+    font-size:14px;
+    cursor:pointer;
+    display:inline-block;
+    transition:background .2s ease;
+}
+
+.back-button{
+    background:#374151;
+}
+
+.back-button:hover{
+    background:#1f2937;
+}
+
+.topology-button{
+    background:#7c3aed;
+}
+
+.topology-button:hover{
+    background:#6d28d9;
+}
+
+.device-card{
+    background:white;
+    border-radius:10px;
+    padding:25px;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+    margin-bottom:25px;
+}
+
+.device-card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+    gap:15px;
+}
+
+.device-card-header h2{
+    margin:0;
+    font-size:24px;
+    color:#1f2937;
+}
+
+.device-status{
+    display:inline-block;
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.status-online{
+    color:#166534;
+    background:#dcfce7;
+}
+
+.status-offline{
+    color:#991b1b;
+    background:#fee2e2;
+}
+
+.device-info-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+}
+
+.info-item{
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+    border-radius:8px;
+    padding:15px;
+}
+
+.info-label{
+    font-size:13px;
+    color:#6b7280;
+    margin-bottom:6px;
+}
+
+.info-value{
+    font-size:16px;
+    font-weight:bold;
+    color:#1f2937;
+    word-break:break-word;
+}
+
+.snmp-status{
+    display:inline-block;
+    padding:5px 10px;
+    border-radius:15px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.snmp-up{
+    color:#166534;
+    background:#dcfce7;
+}
+
+.snmp-down{
+    color:#991b1b;
+    background:#fee2e2;
+}
+
+.section-title{
+    margin:25px 0 15px 0;
+    font-size:20px;
+    color:#1f2937;
+}
+
+.summary{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+    margin-bottom:25px;
+}
+
+.summary-card{
+    background:white;
+    border-radius:10px;
+    padding:22px;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+
+.summary-card h2{
+    margin:0 0 10px 0;
+    font-size:14px;
+    font-weight:normal;
+    color:#6b7280;
+}
+
+.summary-card p{
+    margin:0;
+    font-size:30px;
+    font-weight:bold;
+}
+
+.summary-card.total p{
+    color:#2563eb;
+}
+
+.summary-card.online p{
+    color:#16a34a;
+}
+
+.summary-card.offline p{
+    color:#dc2626;
+}
+
+.performance-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+    margin-bottom:25px;
+}
+
+.performance-card{
+    background:white;
+    border-radius:10px;
+    padding:22px;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+
+.performance-title{
+    font-size:14px;
+    color:#6b7280;
+    margin-bottom:8px;
+}
+
+.performance-value{
+    font-size:28px;
+    font-weight:bold;
+    color:#2563eb;
+}
+
+.snmp-metric-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+    margin-bottom:25px;
+}
+
+.snmp-metric-card{
+    background:white;
+    border-radius:10px;
+    padding:22px;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+
+.metric-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.metric-title{
+    font-size:15px;
+    color:#6b7280;
+}
+
+.metric-value{
+    font-size:32px;
+    font-weight:bold;
+    color:#2563eb;
+    margin-bottom:12px;
+}
+
+.metric-details{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+}
+
+.metric-detail{
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+    border-radius:6px;
+    padding:8px;
+    text-align:center;
+}
+
+.metric-detail-label{
+    display:block;
+    font-size:10px;
+    color:#6b7280;
+    margin-bottom:3px;
+}
+
+.metric-detail-value{
+    display:block;
+    font-size:12px;
+    font-weight:bold;
+    color:#1f2937;
+}
+
+.disk-card{
+    background:white;
+    border-radius:10px;
+    padding:22px;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+    margin-bottom:25px;
+    overflow-x:auto;
+}
+
+.disk-table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:15px;
+}
+
+.disk-table th{
+    background:#f9fafb;
+    color:#6b7280;
+    font-size:12px;
+    text-align:left;
+    padding:12px;
+    border-bottom:1px solid #e5e7eb;
+}
+
+.disk-table td{
+    padding:12px;
+    border-bottom:1px solid #e5e7eb;
+    font-size:13px;
+    color:#374151;
+}
+
+.disk-table tr:last-child td{
+    border-bottom:none;
+}
+
+.disk-utilization{
+    font-weight:bold;
+}
+
+.no-disk-data{
+    text-align:center;
+    color:#6b7280;
+    padding:20px;
+}
+
+.graphs-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+    margin-bottom:25px;
+    min-width:0;
+}
+
+.graph-card{
+    background:white;
+    border-radius:10px;
+    padding:22px;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+    position:relative;
+    min-width:0;
+    width:100%;
+    max-width:100%;
+    overflow:hidden;
+}
+
+.graph-title{
+    margin:0 0 15px 0;
+    font-size:18px;
+    color:#1f2937;
+    padding-right:50px;
+}
+
+.chart-wrapper{
+    position:relative;
+    height:250px;
+    width:100%;
+    min-width:0;
+}
+
+.graph-card canvas{
+    display:block;
+    max-width:100%;
+}
+
+.graph-stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+    margin-bottom:15px;
+}
+
+.graph-stat{
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+    border-radius:7px;
+    padding:9px 8px;
+    text-align:center;
+    min-width:0;
+}
+
+.graph-stat-label{
+    display:block;
+    font-size:11px;
+    color:#6b7280;
+    margin-bottom:4px;
+    white-space:nowrap;
+}
+
+.graph-stat-value{
+    display:block;
+    font-size:14px;
+    font-weight:bold;
+    color:#1f2937;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.fullscreen-button{
+    position:absolute;
+    top:16px;
+    right:16px;
+    width:34px;
+    height:34px;
+    border:1px solid #d1d5db;
+    border-radius:6px;
+    background:#f9fafb;
+    color:#374151;
+    font-size:20px;
+    line-height:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    z-index:20;
+    transition:background .2s ease,color .2s ease,border-color .2s ease;
+}
+
+.fullscreen-button:hover{
+    background:#2563eb;
+    color:white;
+    border-color:#2563eb;
+}
+
+.fullscreen-button:focus{
+    outline:2px solid #93c5fd;
+    outline-offset:2px;
+}
+
+.graph-card:fullscreen{
+    width:100vw;
+    height:100vh;
+    max-width:none;
+    margin:0;
+    padding:30px;
+    border-radius:0;
+    background:white;
+    overflow:hidden;
+    display:block;
+}
+
+.graph-card:fullscreen .chart-wrapper{
+    width:100%;
+    height:calc(100vh - 120px);
+    min-width:0;
+    min-height:0;
+}
+
+.graph-card:fullscreen canvas{
+    width:100% !important;
+    height:100% !important;
+}
+
+.graph-card:-webkit-full-screen{
+    width:100vw;
+    height:100vh;
+    max-width:none;
+    margin:0;
+    padding:30px;
+    border-radius:0;
+    background:white;
+    overflow:hidden;
+    display:block;
+}
+
+.graph-card:-webkit-full-screen .chart-wrapper{
+    width:100%;
+    height:calc(100vh - 120px);
+    min-width:0;
+    min-height:0;
+}
+
+.graph-card:-webkit-full-screen canvas{
+    width:100% !important;
+    height:100% !important;
+}
+
+.timeline-card{
+    background:white;
+    border-radius:10px;
+    padding:22px;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+    margin-bottom:25px;
+}
+
+.timeline-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+    gap:15px;
+}
+
+.timeline-header h2{
+    margin:0;
+    font-size:20px;
+    color:#1f2937;
+}
+
+.timeline-subtitle{
+    font-size:12px;
+    color:#6b7280;
+}
+
+.timeline{
+    position:relative;
+    margin-left:8px;
+    padding-left:28px;
+}
+
+.timeline::before{
+    content:"";
+    position:absolute;
+    left:5px;
+    top:4px;
+    bottom:4px;
+    width:2px;
+    background:#e5e7eb;
+}
+
+.timeline-item{
+    position:relative;
+    padding:0 0 20px 0;
+}
+
+.timeline-item:last-child{
+    padding-bottom:0;
+}
+
+.timeline-dot{
+    position:absolute;
+    left:-28px;
+    top:4px;
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    background:#6b7280;
+    border:2px solid white;
+    box-shadow:0 0 0 2px #d1d5db;
+}
+
+.timeline-dot.online{
+    background:#16a34a;
+    box-shadow:0 0 0 2px #bbf7d0;
+}
+
+.timeline-dot.offline{
+    background:#dc2626;
+    box-shadow:0 0 0 2px #fecaca;
+}
+
+.timeline-content{
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+    border-radius:8px;
+    padding:12px 14px;
+}
+
+.timeline-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-bottom:5px;
+}
+
+.timeline-status{
+    font-size:13px;
+    font-weight:bold;
+    color:#1f2937;
+}
+
+.timeline-time{
+    font-size:11px;
+    color:#6b7280;
+    white-space:nowrap;
+}
+
+.timeline-message{
+    font-size:13px;
+    color:#4b5563;
+    line-height:1.5;
+}
+
+.no-events{
+    text-align:center;
+    color:#6b7280;
+    font-size:14px;
+    padding:25px 10px;
+}
+
+.monitoring-card{
+    background:white;
+    border-radius:10px;
+    padding:20px;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+    margin-top:25px;
+    margin-bottom:25px;
+}
+
+.monitoring-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.monitoring-header h2{
+    margin:0;
+    font-size:20px;
+}
+
+.live-indicator{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    color:#16a34a;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.live-dot{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:#16a34a;
+}
+
+@media (max-width:1100px){
+
+    .snmp-metric-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+}
+
+@media (max-width:900px){
+
+    .graphs-grid{
+        grid-template-columns:1fr;
+    }
+
+    .graph-stats{
+        grid-template-columns:repeat(4,1fr);
+    }
+
+}
+
+@media (max-width:800px){
+
+    .container{
+        width:92%;
+        margin:20px auto;
+    }
+
+    .header{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .header-actions{
+        width:100%;
+    }
+
+    .header-actions a{
+        text-align:center;
+    }
+
+    .header h1{
+        font-size:26px;
+    }
+
+    .device-card-header{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .device-info-grid{
+        grid-template-columns:1fr;
+    }
+
+    .summary{
+        grid-template-columns:1fr;
+    }
+
+    .performance-grid{
+        grid-template-columns:1fr;
+    }
+
+    .snmp-metric-grid{
+        grid-template-columns:1fr;
+    }
+
+    .graph-stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .timeline-top{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- ========================================================= -->
+<!-- HEADER -->
+<!-- ========================================================= -->
+
+<div class="header">
+
+    <h1>
+        Device Details
+    </h1>
+
+    <div class="header-actions">
+
+        <a
+            href="{% url 'open_topology' %}"
+            class="topology-button"
+        >
+            View in Topology
+        </a>
+
+        <a
+            href="{% url 'dashboard' %}"
+            class="back-button"
+        >
+            ← Back to Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- DEVICE INFORMATION -->
+<!-- ========================================================= -->
+
+<div class="device-card">
+
+    <div class="device-card-header">
+
+        <h2 id="device-ip">
+            {{ device.ip_address }}
+        </h2>
+
+        <span
+            id="device-status"
+            class="device-status {% if device.status == 'Online' %}status-online{% else %}status-offline{% endif %}"
+        >
+            {{ device.status }}
+        </span>
+
+    </div>
+
+
+    <div class="device-info-grid">
+
+        <!-- HOSTNAME -->
+        <div class="info-item">
+
+            <div class="info-label">
+                Hostname
+            </div>
+
+            <div
+                class="info-value"
+                id="hostname"
+            >
+
+                {% if snmp_info and snmp_info.hostname %}
+                    {{ snmp_info.hostname }}
+                {% else %}
+                    -
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- MAC -->
+        <div class="info-item">
+
+            <div class="info-label">
+                MAC Address
+            </div>
+
+            <div
+                class="info-value"
+                id="mac-address"
+            >
+
+                {% if device.mac_address %}
+                    {{ device.mac_address }}
+                {% else %}
+                    -
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- IP -->
+        <div class="info-item">
+
+            <div class="info-label">
+                IP Address
+            </div>
+
+            <div
+                class="info-value"
+                id="ip-address"
+            >
+                {{ device.ip_address }}
+            </div>
+
+        </div>
+
+
+        <!-- DEVICE UPTIME -->
+        <div class="info-item">
+
+            <div class="info-label">
+                Uptime
+            </div>
+
+            <div
+                class="info-value"
+                id="uptime"
+            >
+
+                {% if device.uptime_display %}
+                    {{ device.uptime_display }}
+                {% else %}
+                    -
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- LAST SEEN -->
+        <div class="info-item">
+
+            <div class="info-label">
+                Last Seen
+            </div>
+
+            <div
+                class="info-value"
+                id="last-seen"
+            >
+
+                {% if device.last_seen %}
+                    {{ device.last_seen }}
+                {% else %}
+                    -
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- ONLINE SINCE -->
+        <div class="info-item">
+
+            <div class="info-label">
+                Online Since
+            </div>
+
+            <div
+                class="info-value"
+                id="online-since"
+            >
+
+                {% if device.online_since %}
+                    {{ device.online_since }}
+                {% else %}
+                    -
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- SNMP SYSTEM INFORMATION -->
+<!-- ========================================================= -->
+
+<h2 class="section-title">
+    SNMP System Information
+</h2>
+
+<div class="device-card">
+
+    <div class="device-info-grid">
+
+        <!-- SNMP STATUS -->
+        <div class="info-item">
+
+            <div class="info-label">
+                SNMP Status
+            </div>
+
+            <div
+                class="info-value"
+                id="snmp-status"
+            >
+
+                {% if snmp_info and snmp_info.snmp_status == "UP" %}
+
+                    <span class="snmp-status snmp-up">
+                        UP
+                    </span>
+
+                {% else %}
+
+                    <span class="snmp-status snmp-down">
+                        DOWN
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- SNMP HOSTNAME -->
+        <div class="info-item">
+
+            <div class="info-label">
+                SNMP Hostname
+            </div>
+
+            <div
+                class="info-value"
+                id="snmp-hostname"
+            >
+
+                {% if snmp_info and snmp_info.hostname %}
+                    {{ snmp_info.hostname }}
+                {% else %}
+                    -
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- SNMP UPTIME -->
+        <div class="info-item">
+
+            <div class="info-label">
+                SNMP Uptime
+            </div>
+
+            <div
+                class="info-value"
+                id="snmp-uptime"
+            >
+
+                {% if snmp_info and snmp_info.system_uptime %}
+                    {{ snmp_info.system_uptime }}
+                {% else %}
+                    -
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- OBJECT ID -->
+        <div class="info-item">
+
+            <div class="info-label">
+                SNMP Object ID
+            </div>
+
+            <div
+                class="info-value"
+                id="snmp-object-id"
+            >
+
+                {% if snmp_info and snmp_info.object_id %}
+                    {{ snmp_info.object_id }}
+                {% else %}
+                    -
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- LAST UPDATE -->
+        <div class="info-item">
+
+            <div class="info-label">
+                Last SNMP Update
+            </div>
+
+            <div
+                class="info-value"
+                id="snmp-last-updated"
+            >
+
+                {% if snmp_info and snmp_info.last_updated %}
+                    {{ snmp_info.last_updated }}
+                {% else %}
+                    -
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- SYSTEM DESCRIPTION -->
+        <div class="info-item">
+
+            <div class="info-label">
+                System / Firmware
+            </div>
+
+            <div
+                class="info-value"
+                id="snmp-system-description"
+            >
+
+                {% if snmp_info and snmp_info.system_description %}
+                    {{ snmp_info.system_description }}
+                {% else %}
+                    -
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- PING STATISTICS -->
+<!-- ========================================================= -->
+
+<h2 class="section-title">
+    Ping Statistics
+</h2>
+
+<div class="summary">
+
+    <div class="summary-card total">
+
+        <h2>
+            Packets Sent
+        </h2>
+
+        <p id="packets-sent">
+
+            {% if stats %}
+                {{ stats.packets_sent }}
+            {% else %}
+                0
+            {% endif %}
+
+        </p>
+
+    </div>
+
+
+    <div class="summary-card online">
+
+        <h2>
+            Packets Received
+        </h2>
+
+        <p id="packets-received">
+
+            {% if stats %}
+                {{ stats.packets_received }}
+            {% else %}
+                0
+            {% endif %}
+
+        </p>
+
+    </div>
+
+
+    <div class="summary-card offline">
+
+        <h2>
+            Packets Lost
+        </h2>
+
+        <p id="packets-lost">
+
+            {% if stats %}
+                {{ stats.packets_lost }}
+            {% else %}
+                0
+            {% endif %}
+
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- NETWORK PERFORMANCE -->
+<!-- ========================================================= -->
+
+<h2 class="section-title">
+    Network Performance
+</h2>
+
+<div class="performance-grid">
+
+    <div class="performance-card">
+
+        <div class="performance-title">
+            Current Latency
+        </div>
+
+        <div
+            class="performance-value"
+            id="current-latency"
+        >
+
+            {% if stats and stats.latency_ms %}
+                {{ stats.latency_ms }} ms
+            {% else %}
+                -
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <div class="performance-card">
+
+        <div class="performance-title">
+            Last Poll
+        </div>
+
+        <div
+            class="performance-value"
+            id="last-poll"
+        >
+
+            {% if stats and stats.last_poll_time %}
+                {{ stats.last_poll_time }}
+            {% else %}
+                -
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- SNMP RESOURCE MONITORING -->
+<!-- ========================================================= -->
+
+<h2 class="section-title">
+    SNMP Resource Monitoring
+</h2>
+
+<div class="snmp-metric-grid">
+
+
+    <!-- CPU -->
+
+    <div class="snmp-metric-card">
+
+        <div class="metric-header">
+
+            <div class="metric-title">
+                CPU Utilization
+            </div>
+
+        </div>
+
+        <div
+            class="metric-value"
+            id="cpu-utilization"
+        >
+            -
+        </div>
+
+        <div class="metric-details">
+
+            <div class="metric-detail">
+
+                <span class="metric-detail-label">
+                    Status
+                </span>
+
+                <span
+                    class="metric-detail-value"
+                    id="cpu-status"
+                >
+                    -
+                </span>
+
+            </div>
+
+            <div class="metric-detail">
+
+                <span class="metric-detail-label">
+                    Last Update
+                </span>
+
+                <span
+                    class="metric-detail-value"
+                    id="cpu-timestamp"
+                >
+                    -
+                </span>
+
+            </div>
+
+            <div class="metric-detail">
+
+                <span class="metric-detail-label">
+                    Unit
+                </span>
+
+                <span class="metric-detail-value">
+                    %
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- MEMORY -->
+
+    <div class="snmp-metric-card">
+
+        <div class="metric-header">
+
+            <div class="metric-title">
+                Memory Utilization
+            </div>
+
+        </div>
+
+        <div
+            class="metric-value"
+            id="memory-utilization"
+        >
+            -
+        </div>
+
+        <div class="metric-details">
+
+            <div class="metric-detail">
+
+                <span class="metric-detail-label">
+                    Total
+                </span>
+
+                <span
+                    class="metric-detail-value"
+                    id="memory-total"
+                >
+                    -
+                </span>
+
+            </div>
+
+            <div class="metric-detail">
+
+                <span class="metric-detail-label">
+                    Used
+                </span>
+
+                <span
+                    class="metric-detail-value"
+                    id="memory-used"
+                >
+                    -
+                </span>
+
+            </div>
+
+            <div class="metric-detail">
+
+                <span class="metric-detail-label">
+                    Available
+                </span>
+
+                <span
+                    class="metric-detail-value"
+                    id="memory-available"
+                >
+                    -
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- SNMP MONITORING -->
+
+    <div class="snmp-metric-card">
+
+        <div class="metric-header">
+
+            <div class="metric-title">
+                SNMP Monitoring
+            </div>
+
+        </div>
+
+        <div
+            class="metric-value"
+            id="snmp-monitoring-status"
+        >
+            -
+        </div>
+
+        <div class="metric-details">
+
+            <div class="metric-detail">
+
+                <span class="metric-detail-label">
+                    Host
+                </span>
+
+                <span
+                    class="metric-detail-value"
+                    id="snmp-monitoring-host"
+                >
+                    -
+                </span>
+
+            </div>
+
+            <div class="metric-detail">
+
+                <span class="metric-detail-label">
+                    CPU
+                </span>
+
+                <span
+                    class="metric-detail-value"
+                    id="snmp-monitoring-cpu"
+                >
+                    -
+                </span>
+
+            </div>
+
+            <div class="metric-detail">
+
+                <span class="metric-detail-label">
+                    Memory
+                </span>
+
+                <span
+                    class="metric-detail-value"
+                    id="snmp-monitoring-memory"
+                >
+                    -
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- DISK MONITORING -->
+<!-- ========================================================= -->
+
+<h2 class="section-title">
+    Disk Monitoring
+</h2>
+
+<div class="disk-card">
+
+    <div id="disk-table-container">
+
+        <div class="no-disk-data">
+            No disk information available.
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- NETWORK HISTORY -->
+<!-- ========================================================= -->
+
+<h2 class="section-title">
+    Network Performance History
+</h2>
+
+<div class="graphs-grid">
+
+
+    <!-- LATENCY -->
+
+    <div
+        class="graph-card"
+        id="latencyGraphCard"
+    >
+
+        <button
+            type="button"
+            class="fullscreen-button"
+            data-graph-id="latencyGraphCard"
+            aria-label="Open latency graph in fullscreen"
+            title="Fullscreen"
+        >
+            ⛶
+        </button>
+
+        <h3 class="graph-title">
+            Latency Over Time
+        </h3>
+
+        <div class="graph-stats">
+
+            <div class="graph-stat">
+
+                <span class="graph-stat-label">
+                    Current
+                </span>
+
+                <span
+                    class="graph-stat-value"
+                    id="latency-current"
+                >
+                    -
+                </span>
+
+            </div>
+
+            <div class="graph-stat">
+
+                <span class="graph-stat-label">
+                    Average
+                </span>
+
+                <span
+                    class="graph-stat-value"
+                    id="latency-average"
+                >
+                    -
+                </span>
+
+            </div>
+
+            <div class="graph-stat">
+
+                <span class="graph-stat-label">
+                    Minimum
+                </span>
+
+                <span
+                    class="graph-stat-value"
+                    id="latency-minimum"
+                >
+                    -
+                </span>
+
+            </div>
+
+            <div class="graph-stat">
+
+                <span class="graph-stat-label">
+                    Maximum
+                </span>
+
+                <span
+                    class="graph-stat-value"
+                    id="latency-maximum"
+                >
+                    -
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="chart-wrapper">
+
+            <canvas id="latencyChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <!-- PACKET LOSS -->
+
+    <div
+        class="graph-card"
+        id="packetLossGraphCard"
+    >
+
+        <button
+            type="button"
+            class="fullscreen-button"
+            data-graph-id="packetLossGraphCard"
+            aria-label="Open packet loss graph in fullscreen"
+            title="Fullscreen"
+        >
+            ⛶
+        </button>
+
+        <h3 class="graph-title">
+            Packet Loss Over Time
+        </h3>
+
+        <div class="graph-stats">
+
+            <div class="graph-stat">
+
+                <span class="graph-stat-label">
+                    Current
+                </span>
+
+                <span
+                    class="graph-stat-value"
+                    id="packet-current"
+                >
+                    -
+                </span>
+
+            </div>
+
+            <div class="graph-stat">
+
+                <span class="graph-stat-label">
+                    Average
+                </span>
+
+                <span
+                    class="graph-stat-value"
+                    id="packet-average"
+                >
+                    -
+                </span>
+
+            </div>
+
+            <div class="graph-stat">
+
+                <span class="graph-stat-label">
+                    Minimum
+                </span>
+
+                <span
+                    class="graph-stat-value"
+                    id="packet-minimum"
+                >
+                    -
+                </span>
+
+            </div>
+
+            <div class="graph-stat">
+
+                <span class="graph-stat-label">
+                    Maximum
+                </span>
+
+                <span
+                    class="graph-stat-value"
+                    id="packet-maximum"
+                >
+                    -
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="chart-wrapper">
+
+            <canvas id="packetLossChart"></canvas>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- SNMP HISTORY -->
+<!-- ========================================================= -->
+
+<h2 class="section-title">
+    SNMP Resource History
+</h2>
+
+<div class="graphs-grid">
+
+
+    <!-- CPU -->
+
+    <div
+        class="graph-card"
+        id="cpuGraphCard"
+    >
+
+        <button
+            type="button"
+            class="fullscreen-button"
+            data-graph-id="cpuGraphCard"
+            aria-label="Open CPU graph in fullscreen"
+            title="Fullscreen"
+        >
+            ⛶
+        </button>
+
+        <h3 class="graph-title">
+            CPU Utilization Over Time
+        </h3>
+
+        <div class="graph-stats">
+
+            <div class="graph-stat">
+
+                <span class="graph-stat-label">
+                    Current
+                </span>
+
+                <span
+                    class="graph-stat-value"
+                    id="cpu-current"
+                >
+                    -
+                </span>
+
+            </div>
+
+            <div class="graph-stat">
+
+                <span class="graph-stat-label">
+                    Average
+                </span>
+
+                <span
+                    class="graph-stat-value"
+                    id="cpu-average"
+                >
+                    -
+                </span>
+
+            </div>
+
+            <div class="graph-stat">
+
+                <span class="graph-stat-label">
+                    Minimum
+                </span>
+
+                <span
+                    class="graph-stat-value"
+                    id="cpu-minimum"
+                >
+                    -
+                </span>
+
+            </div>
+
+            <div class="graph-stat">
+
+                <span class="graph-stat-label">
+                    Maximum
+                </span>
+
+                <span
+                    class="graph-stat-value"
+                    id="cpu-maximum"
+                >
+                    -
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="chart-wrapper">
+
+            <canvas id="cpuChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <!-- MEMORY -->
+
+    <div
+        class="graph-card"
+        id="memoryGraphCard"
+    >
+
+        <button
+            type="button"
+            class="fullscreen-button"
+            data-graph-id="memoryGraphCard"
+            aria-label="Open memory graph in fullscreen"
+            title="Fullscreen"
+        >
+            ⛶
+        </button>
+
+        <h3 class="graph-title">
+            Memory Utilization Over Time
+        </h3>
+
+        <div class="graph-stats">
+
+            <div class="graph-stat">
+
+                <span class="graph-stat-label">
+                    Current
+                </span>
+
+                <span
+                    class="graph-stat-value"
+                    id="memory-current"
+                >
+                    -
+                </span>
+
+            </div>
+
+            <div class="graph-stat">
+
+                <span class="graph-stat-label">
+                    Average
+                </span>
+
+                <span
+                    class="graph-stat-value"
+                    id="memory-average"
+                >
+                    -
+                </span>
+
+            </div>
+
+            <div class="graph-stat">
+
+                <span class="graph-stat-label">
+                    Minimum
+                </span>
+
+                <span
+                    class="graph-stat-value"
+                    id="memory-minimum"
+                >
+                    -
+                </span>
+
+            </div>
+
+            <div class="graph-stat">
+
+                <span class="graph-stat-label">
+                    Maximum
+                </span>
+
+                <span
+                    class="graph-stat-value"
+                    id="memory-maximum"
+                >
+                    -
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="chart-wrapper">
+
+            <canvas id="memoryChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <!-- DISK -->
+
+    <div
+        class="graph-card"
+        id="diskGraphCard"
+    >
+
+        <button
+            type="button"
+            class="fullscreen-button"
+            data-graph-id="diskGraphCard"
+            aria-label="Open disk graph in fullscreen"
+            title="Fullscreen"
+        >
+            ⛶
+        </button>
+
+        <h3 class="graph-title">
+            Disk Utilization Over Time
+        </h3>
+
+        <div class="graph-stats">
+
+            <div class="graph-stat">
+
+                <span class="graph-stat-label">
+                    Current
+                </span>
+
+                <span
+                    class="graph-stat-value"
+                    id="disk-current"
+                >
+                    -
+                </span>
+
+            </div>
+
+            <div class="graph-stat">
+
+                <span class="graph-stat-label">
+                    Average
+                </span>
+
+                <span
+                    class="graph-stat-value"
+                    id="disk-average"
+                >
+                    -
+                </span>
+
+            </div>
+
+            <div class="graph-stat">
+
+                <span class="graph-stat-label">
+                    Minimum
+                </span>
+
+                <span
+                    class="graph-stat-value"
+                    id="disk-minimum"
+                >
+                    -
+                </span>
+
+            </div>
+
+            <div class="graph-stat">
+
+                <span class="graph-stat-label">
+                    Maximum
+                </span>
+
+                <span
+                    class="graph-stat-value"
+                    id="disk-maximum"
+                >
+                    -
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="chart-wrapper">
+
+            <canvas id="diskChart"></canvas>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- EVENT TIMELINE -->
+<!-- ========================================================= -->
+
+<div class="timeline-card">
+
+    <div class="timeline-header">
+
+        <div>
+
+            <h2>
+                Event Timeline
+            </h2>
+
+            <div class="timeline-subtitle">
+                Recent device status events
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div
+        class="timeline"
+        id="eventTimeline"
+    >
+
+        {% for log in logs %}
+
+        <div class="timeline-item">
+
+            <span
+                class="timeline-dot
+                {% if log.status == 'Online' %}online{% elif log.status == 'Offline' %}offline{% endif %}"
+            ></span>
+
+            <div class="timeline-content">
+
+                <div class="timeline-top">
+
+                    <span class="timeline-status">
+
+                        {% if log.status == "Online" %}
+                            Device Online
+                        {% elif log.status == "Offline" %}
+                            Device Offline
+                        {% else %}
+                            {{ log.status }}
+                        {% endif %}
+
+                    </span>
+
+                    <span class="timeline-time">
+                        {{ log.timestamp }}
+                    </span>
+
+                </div>
+
+                <div class="timeline-message">
+
+                    {% if log.message %}
+
+                        {{ log.message }}
+
+                    {% else %}
+
+                        {% if log.status == "Online" %}
+                            Device became reachable.
+                        {% elif log.status == "Offline" %}
+                            Device became unreachable.
+                        {% else %}
+                            Device status changed.
+                        {% endif %}
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% empty %}
+
+        <div
+            class="no-events"
+            id="noEventsMessage"
+        >
+            No device events recorded yet.
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- LIVE MONITORING -->
+<!-- ========================================================= -->
+
+<div class="monitoring-card">
+
+    <div class="monitoring-header">
+
+        <h2>
+            Device Monitoring
+        </h2>
+
+        <div class="live-indicator">
+
+            <span class="live-dot"></span>
+
+            Live Monitoring
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- JAVASCRIPT -->
+<!-- ========================================================= -->
+
+<script>
+
+const deviceApiUrl =
+    "{% url 'device_detail_api' device.ip_address %}";
+
+
+const initialLatencyData =
+    JSON.parse('{{ latency_chart_data|escapejs }}');
+
+
+const initialPacketLossData =
+    JSON.parse('{{ packet_loss_chart_data|escapejs }}');
+
+
+const initialCpuData =
+    JSON.parse('{{ cpu_chart_data|escapejs }}');
+
+
+const initialMemoryData =
+    JSON.parse('{{ memory_chart_data|escapejs }}');
+
+
+const initialDiskData =
+    JSON.parse('{{ disk_chart_data|escapejs }}');
+
+
+let latencyChart = null;
+let packetLossChart = null;
+let cpuChart = null;
+let memoryChart = null;
+let diskChart = null;
+
+
+/* =========================================================
+   FORMAT METRIC
+========================================================= */
+
+function formatMetric(value, suffix){
+
+    if(
+        value === null ||
+        value === undefined ||
+        Number.isNaN(Number(value))
+    ){
+        return "-";
+    }
+
+    return Number(value).toFixed(2) + suffix;
+}
+
+
+/* =========================================================
+   FORMAT BYTES
+========================================================= */
+
+function formatBytes(bytes){
+
+    if(
+        bytes === null ||
+        bytes === undefined ||
+        Number.isNaN(Number(bytes))
+    ){
+        return "-";
+    }
+
+    const value = Number(bytes);
+
+    if(value === 0){
+        return "0 B";
+    }
+
+    const units = [
+        "B",
+        "KB",
+        "MB",
+        "GB",
+        "TB"
+    ];
+
+    const index = Math.floor(
+        Math.log(value) / Math.log(1024)
+    );
+
+    const safeIndex =
+        Math.min(
+            Math.max(index, 0),
+            units.length - 1
+        );
+
+    return (
+        value /
+        Math.pow(1024, safeIndex)
+    ).toFixed(2)
+    + " "
+    + units[safeIndex];
+}
+
+
+/* =========================================================
+   SNMP UPTIME FORMAT
+========================================================= */
+
+/*
+    SNMP sysUpTime is returned as TimeTicks.
+
+    1 TimeTick = 1/100 second.
+
+    Example:
+
+    1835324
+        ↓
+    18353.24 seconds
+        ↓
+    0 days 5 hrs 5 mins 53 secs
+*/
+
+function formatSNMPUptime(ticks){
+
+    if(
+        ticks === null ||
+        ticks === undefined ||
+        ticks === "" ||
+        ticks === "-" ||
+        Number.isNaN(Number(ticks))
+    ){
+        return "-";
+    }
+
+    let totalSeconds =
+        Math.floor(
+            Number(ticks) / 100
+        );
+
+
+    const days =
+        Math.floor(
+            totalSeconds / 86400
+        );
+
+    totalSeconds =
+        totalSeconds % 86400;
+
+
+    const hours =
+        Math.floor(
+            totalSeconds / 3600
+        );
+
+    totalSeconds =
+        totalSeconds % 3600;
+
+
+    const minutes =
+        Math.floor(
+            totalSeconds / 60
+        );
+
+
+    const seconds =
+        totalSeconds % 60;
+
+
+    return (
+        days +
+        " days " +
+        hours +
+        " hrs " +
+        minutes +
+        " mins " +
+        seconds +
+        " secs"
+    );
+}
+
+
+/* =========================================================
+   GRAPH STATISTICS
+========================================================= */
+
+function updateGraphStatistics(
+    values,
+    currentId,
+    averageId,
+    minimumId,
+    maximumId,
+    suffix
+){
+
+    const validValues =
+        values
+        .map(Number)
+        .filter(function(value){
+
+            return (
+                Number.isFinite(value) &&
+                value >= 0
+            );
+
+        });
+
+
+    if(validValues.length === 0){
+
+        document.getElementById(currentId).textContent = "-";
+        document.getElementById(averageId).textContent = "-";
+        document.getElementById(minimumId).textContent = "-";
+        document.getElementById(maximumId).textContent = "-";
+
+        return;
+    }
+
+
+    const current =
+        validValues[validValues.length - 1];
+
+
+    const total =
+        validValues.reduce(
+            function(sum, value){
+                return sum + value;
+            },
+            0
+        );
+
+
+    const average =
+        total / validValues.length;
+
+
+    const minimum =
+        Math.min(...validValues);
+
+
+    const maximum =
+        Math.max(...validValues);
+
+
+    document.getElementById(currentId).textContent =
+        formatMetric(current, suffix);
+
+
+    document.getElementById(averageId).textContent =
+        formatMetric(average, suffix);
+
+
+    document.getElementById(minimumId).textContent =
+        formatMetric(minimum, suffix);
+
+
+    document.getElementById(maximumId).textContent =
+        formatMetric(maximum, suffix);
+}
+
+
+/* =========================================================
+   LATENCY CHART
+========================================================= */
+
+function createLatencyChart(labels, values){
+
+    const canvas =
+        document.getElementById("latencyChart");
+
+    if(!canvas){
+        return;
+    }
+
+
+    latencyChart =
+        new Chart(
+            canvas,
+            {
+
+                type:"line",
+
+                data:{
+                    labels:labels,
+
+                    datasets:[
+
+                        {
+                            label:"Latency (ms)",
+
+                            data:values,
+
+                            borderWidth:2,
+
+                            tension:0.3,
+
+                            fill:false,
+
+                            pointRadius:3,
+
+                            pointHoverRadius:5
+                        }
+
+                    ]
+                },
+
+                options:{
+
+                    responsive:true,
+
+                    maintainAspectRatio:false,
+
+                    animation:false,
+
+                    interaction:{
+                        mode:"index",
+                        intersect:false
+                    },
+
+                    plugins:{
+                        legend:{
+                            display:true
+                        }
+                    },
+
+                    scales:{
+
+                        x:{
+                            title:{
+                                display:true,
+                                text:"Time"
+                            }
+                        },
+
+                        y:{
+                            beginAtZero:true,
+
+                            title:{
+                                display:true,
+                                text:"Latency (ms)"
+                            }
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+}
+
+
+/* =========================================================
+   PACKET LOSS CHART
+========================================================= */
+
+function createPacketLossChart(labels, values){
+
+    const canvas =
+        document.getElementById("packetLossChart");
+
+    if(!canvas){
+        return;
+    }
+
+
+    packetLossChart =
+        new Chart(
+            canvas,
+            {
+
+                type:"line",
+
+                data:{
+
+                    labels:labels,
+
+                    datasets:[
+
+                        {
+
+                            label:"Packet Loss (%)",
+
+                            data:values,
+
+                            borderWidth:2,
+
+                            tension:0.3,
+
+                            fill:false,
+
+                            pointRadius:3,
+
+                            pointHoverRadius:5
+
+                        }
+
+                    ]
+
+                },
+
+                options:{
+
+                    responsive:true,
+
+                    maintainAspectRatio:false,
+
+                    animation:false,
+
+                    interaction:{
+                        mode:"index",
+                        intersect:false
+                    },
+
+                    plugins:{
+                        legend:{
+                            display:true
+                        }
+                    },
+
+                    scales:{
+
+                        x:{
+                            title:{
+                                display:true,
+                                text:"Time"
+                            }
+                        },
+
+                        y:{
+
+                            beginAtZero:true,
+
+                            max:100,
+
+                            title:{
+                                display:true,
+                                text:"Packet Loss (%)"
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+}
+
+
+/* =========================================================
+   CPU CHART
+========================================================= */
+
+function createCpuChart(labels, values){
+
+    const canvas =
+        document.getElementById("cpuChart");
+
+    if(!canvas){
+        return;
+    }
+
+
+    cpuChart =
+        new Chart(
+            canvas,
+            {
+
+                type:"line",
+
+                data:{
+
+                    labels:labels,
+
+                    datasets:[
+
+                        {
+
+                            label:"CPU Utilization (%)",
+
+                            data:values,
+
+                            borderWidth:2,
+
+                            tension:0.3,
+
+                            fill:false,
+
+                            pointRadius:3,
+
+                            pointHoverRadius:5
+
+                        }
+
+                    ]
+
+                },
+
+                options:{
+
+                    responsive:true,
+
+                    maintainAspectRatio:false,
+
+                    animation:false,
+
+                    interaction:{
+                        mode:"index",
+                        intersect:false
+                    },
+
+                    plugins:{
+                        legend:{
+                            display:true
+                        }
+                    },
+
+                    scales:{
+
+                        x:{
+                            title:{
+                                display:true,
+                                text:"Time"
+                            }
+                        },
+
+                        y:{
+
+                            beginAtZero:true,
+
+                            max:100,
+
+                            title:{
+                                display:true,
+                                text:"CPU (%)"
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+}
+
+
+/* =========================================================
+   MEMORY CHART
+========================================================= */
+
+function createMemoryChart(labels, values){
+
+    const canvas =
+        document.getElementById("memoryChart");
+
+    if(!canvas){
+        return;
+    }
+
+
+    memoryChart =
+        new Chart(
+            canvas,
+            {
+
+                type:"line",
+
+                data:{
+
+                    labels:labels,
+
+                    datasets:[
+
+                        {
+
+                            label:"Memory Utilization (%)",
+
+                            data:values,
+
+                            borderWidth:2,
+
+                            tension:0.3,
+
+                            fill:false,
+
+                            pointRadius:3,
+
+                            pointHoverRadius:5
+
+                        }
+
+                    ]
+
+                },
+
+                options:{
+
+                    responsive:true,
+
+                    maintainAspectRatio:false,
+
+                    animation:false,
+
+                    interaction:{
+                        mode:"index",
+                        intersect:false
+                    },
+
+                    plugins:{
+                        legend:{
+                            display:true
+                        }
+                    },
+
+                    scales:{
+
+                        x:{
+                            title:{
+                                display:true,
+                                text:"Time"
+                            }
+                        },
+
+                        y:{
+
+                            beginAtZero:true,
+
+                            max:100,
+
+                            title:{
+                                display:true,
+                                text:"Memory (%)"
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+}
+
+
+/* =========================================================
+   DISK CHART
+========================================================= */
+
+function createDiskChart(labels, values){
+
+    const canvas =
+        document.getElementById("diskChart");
+
+    if(!canvas){
+        return;
+    }
+
+
+    diskChart =
+        new Chart(
+            canvas,
+            {
+
+                type:"line",
+
+                data:{
+
+                    labels:labels,
+
+                    datasets:[
+
+                        {
+
+                            label:"Disk Utilization (%)",
+
+                            data:values,
+
+                            borderWidth:2,
+
+                            tension:0.3,
+
+                            fill:false,
+
+                            pointRadius:3,
+
+                            pointHoverRadius:5
+
+                        }
+
+                    ]
+
+                },
+
+                options:{
+
+                    responsive:true,
+
+                    maintainAspectRatio:false,
+
+                    animation:false,
+
+                    interaction:{
+                        mode:"index",
+                        intersect:false
+                    },
+
+                    plugins:{
+                        legend:{
+                            display:true
+                        }
+                    },
+
+                    scales:{
+
+                        x:{
+                            title:{
+                                display:true,
+                                text:"Time"
+                            }
+                        },
+
+                        y:{
+
+                            beginAtZero:true,
+
+                            max:100,
+
+                            title:{
+                                display:true,
+                                text:"Disk (%)"
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+}
+
+
+/* =========================================================
+   INITIALIZE CHARTS
+========================================================= */
+
+createLatencyChart(
+    initialLatencyData.labels || [],
+    initialLatencyData.values || []
+);
+
+
+createPacketLossChart(
+    initialPacketLossData.labels || [],
+    initialPacketLossData.values || []
+);
+
+
+createCpuChart(
+    initialCpuData.labels || [],
+    initialCpuData.values || []
+);
+
+
+createMemoryChart(
+    initialMemoryData.labels || [],
+    initialMemoryData.values || []
+);
+
+
+createDiskChart(
+    initialDiskData.labels || [],
+    initialDiskData.values || []
+);
+
+
+/* =========================================================
+   INITIAL GRAPH STATISTICS
+========================================================= */
+
+updateGraphStatistics(
+    initialLatencyData.values || [],
+    "latency-current",
+    "latency-average",
+    "latency-minimum",
+    "latency-maximum",
+    " ms"
+);
+
+
+updateGraphStatistics(
+    initialPacketLossData.values || [],
+    "packet-current",
+    "packet-average",
+    "packet-minimum",
+    "packet-maximum",
+    "%"
+);
+
+
+updateGraphStatistics(
+    initialCpuData.values || [],
+    "cpu-current",
+    "cpu-average",
+    "cpu-minimum",
+    "cpu-maximum",
+    "%"
+);
+
+
+updateGraphStatistics(
+    initialMemoryData.values || [],
+    "memory-current",
+    "memory-average",
+    "memory-minimum",
+    "memory-maximum",
+    "%"
+);
+
+
+updateGraphStatistics(
+    initialDiskData.values || [],
+    "disk-current",
+    "disk-average",
+    "disk-minimum",
+    "disk-maximum",
+    "%"
+);
+
+
+/* =========================================================
+   FULLSCREEN
+========================================================= */
+
+async function toggleFullscreen(graphId){
+
+    const graphCard =
+        document.getElementById(graphId);
+
+    if(!graphCard){
+        return;
+    }
+
+
+    if(document.fullscreenElement === graphCard){
+
+        try{
+
+            await document.exitFullscreen();
+
+        }
+        catch(error){
+
+            console.error(
+                "Unable to exit fullscreen:",
+                error
+            );
+
+        }
+
+        return;
+    }
+
+
+    if(document.fullscreenElement){
+
+        try{
+
+            await document.exitFullscreen();
+
+        }
+        catch(error){
+
+            console.error(
+                "Unable to exit existing fullscreen:",
+                error
+            );
+
+        }
+
+    }
+
+
+    try{
+
+        await graphCard.requestFullscreen();
+
+    }
+    catch(error){
+
+        console.error(
+            "Unable to enter fullscreen:",
+            error
+        );
+
+    }
+
+}
+
+
+const fullscreenButtons =
+    document.querySelectorAll(
+        ".fullscreen-button"
+    );
+
+
+fullscreenButtons.forEach(
+    function(button){
+
+        button.addEventListener(
+            "click",
+            function(){
+
+                const graphId =
+                    button.getAttribute(
+                        "data-graph-id"
+                    );
+
+                toggleFullscreen(graphId);
+
+            }
+        );
+
+    }
+);
+
+
+/* =========================================================
+   RESIZE CHARTS
+========================================================= */
+
+function resizeCharts(){
+
+    requestAnimationFrame(
+        function(){
+
+            if(latencyChart){
+                latencyChart.resize();
+            }
+
+            if(packetLossChart){
+                packetLossChart.resize();
+            }
+
+            if(cpuChart){
+                cpuChart.resize();
+            }
+
+            if(memoryChart){
+                memoryChart.resize();
+            }
+
+            if(diskChart){
+                diskChart.resize();
+            }
+
+        }
+    );
+
+
+    setTimeout(
+        function(){
+
+            if(latencyChart){
+                latencyChart.resize();
+            }
+
+            if(packetLossChart){
+                packetLossChart.resize();
+            }
+
+            if(cpuChart){
+                cpuChart.resize();
+            }
+
+            if(memoryChart){
+                memoryChart.resize();
+            }
+
+            if(diskChart){
+                diskChart.resize();
+            }
+
+        },
+        300
+    );
+
+}
+
+
+document.addEventListener(
+    "fullscreenchange",
+    function(){
+
+        const fullscreenElement =
+            document.fullscreenElement;
+
+
+        fullscreenButtons.forEach(
+            function(button){
+
+                const graphId =
+                    button.getAttribute(
+                        "data-graph-id"
+                    );
+
+
+                if(
+                    fullscreenElement &&
+                    fullscreenElement.id === graphId
+                ){
+
+                    button.textContent = "×";
+
+                    button.setAttribute(
+                        "aria-label",
+                        "Exit fullscreen"
+                    );
+
+                    button.setAttribute(
+                        "title",
+                        "Exit fullscreen"
+                    );
+
+                }
+                else{
+
+                    button.textContent = "⛶";
+
+                    button.setAttribute(
+                        "aria-label",
+                        "Open graph in fullscreen"
+                    );
+
+                    button.setAttribute(
+                        "title",
+                        "Fullscreen"
+                    );
+
+                }
+
+            }
+        );
+
+
+        resizeCharts();
+
+    }
+);
+
+
+window.addEventListener(
+    "resize",
+    resizeCharts
+);
+
+
+/* =========================================================
+   DEVICE INFORMATION UPDATE
+========================================================= */
+
+function updateDeviceInformation(data){
+
+    const device =
+        data.device || {};
+
+    const stats =
+        data.stats || {};
+
+
+    const statusElement =
+        document.getElementById(
+            "device-status"
+        );
+
+
+    if(statusElement){
+
+        statusElement.textContent =
+            device.status || "Offline";
+
+
+        statusElement.classList.remove(
+            "status-online",
+            "status-offline"
+        );
+
+
+        if(device.status === "Online"){
+
+            statusElement.classList.add(
+                "status-online"
+            );
+
+        }
+        else{
+
+            statusElement.classList.add(
+                "status-offline"
+            );
+
+        }
+
+    }
+
+
+    /*
+       IMPORTANT:
+
+       Hostname is deliberately NOT taken
+       from device.hostname.
+
+       It is updated from SNMP data inside
+       updateSNMPInformation().
+    */
+
+
+    document.getElementById(
+        "mac-address"
+    ).textContent =
+        device.mac || "-";
+
+
+    document.getElementById(
+        "ip-address"
+    ).textContent =
+        device.ip || "-";
+
+
+    document.getElementById(
+        "uptime"
+    ).textContent =
+        device.uptime || "-";
+
+
+    document.getElementById(
+        "last-seen"
+    ).textContent =
+        device.last_seen || "-";
+
+
+    document.getElementById(
+        "online-since"
+    ).textContent =
+        device.online_since || "-";
+
+
+    document.getElementById(
+        "packets-sent"
+    ).textContent =
+        stats.packets_sent ?? 0;
+
+
+    document.getElementById(
+        "packets-received"
+    ).textContent =
+        stats.packets_received ?? 0;
+
+
+    document.getElementById(
+        "packets-lost"
+    ).textContent =
+        stats.packets_lost ?? 0;
+
+
+    if(
+        stats.latency_ms !== null &&
+        stats.latency_ms !== undefined
+    ){
+
+        document.getElementById(
+            "current-latency"
+        ).textContent =
+            formatMetric(
+                stats.latency_ms,
+                " ms"
+            );
+
+    }
+    else{
+
+        document.getElementById(
+            "current-latency"
+        ).textContent = "-";
+
+    }
+
+
+    document.getElementById(
+        "last-poll"
+    ).textContent =
+        stats.last_poll_time || "-";
+
+}
+
+
+/* =========================================================
+   SNMP INFORMATION UPDATE
+========================================================= */
+
+function updateSNMPInformation(data){
+
+    const snmp =
+        data.snmp || {};
+
+    const cpu =
+        data.cpu || {};
+
+    const memory =
+        data.memory || {};
+
+
+    /* -------------------------------------------------------
+       SNMP STATUS
+    ------------------------------------------------------- */
+
+    const snmpStatusElement =
+        document.getElementById(
+            "snmp-status"
+        );
+
+
+    const status =
+        snmp.status || "DOWN";
+
+
+    if(snmpStatusElement){
+
+        if(status === "UP"){
+
+            snmpStatusElement.innerHTML =
+                '<span class="snmp-status snmp-up">UP</span>';
+
+        }
+        else{
+
+            snmpStatusElement.innerHTML =
+                '<span class="snmp-status snmp-down">DOWN</span>';
+
+        }
+
+    }
+
+
+    /* -------------------------------------------------------
+       SNMP HOSTNAME
+
+       BOTH HOSTNAME LOCATIONS USE THIS VALUE.
+    ------------------------------------------------------- */
+
+    const snmpHostname =
+        snmp.hostname || "-";
+
+
+    document.getElementById(
+        "hostname"
+    ).textContent =
+        snmpHostname;
+
+
+    document.getElementById(
+        "snmp-hostname"
+    ).textContent =
+        snmpHostname;
+
+
+    /* -------------------------------------------------------
+       SNMP UPTIME
+
+       Convert TimeTicks to:
+       days / hrs / mins / secs
+    ------------------------------------------------------- */
+
+    document.getElementById(
+        "snmp-uptime"
+    ).textContent =
+        formatSNMPUptime(
+            snmp.system_uptime
+        );
+
+
+    /* -------------------------------------------------------
+       OTHER SNMP INFORMATION
+    ------------------------------------------------------- */
+
+    document.getElementById(
+        "snmp-object-id"
+    ).textContent =
+        snmp.object_id || "-";
+
+
+    document.getElementById(
+        "snmp-last-updated"
+    ).textContent =
+        snmp.last_updated || "-";
+
+
+    document.getElementById(
+        "snmp-system-description"
+    ).textContent =
+        snmp.system_description || "-";
+
+
+    /* -------------------------------------------------------
+       CPU
+    ------------------------------------------------------- */
+
+    const cpuValue =
+        Number(
+            cpu.utilization ?? 0
+        );
+
+
+    document.getElementById(
+        "cpu-utilization"
+    ).textContent =
+        formatMetric(
+            cpuValue,
+            "%"
+        );
+
+
+    document.getElementById(
+        "cpu-status"
+    ).textContent =
+        status === "UP"
+            ? "Active"
+            : "Unavailable";
+
+
+    document.getElementById(
+        "cpu-timestamp"
+    ).textContent =
+        cpu.timestamp || "-";
+
+
+    /* -------------------------------------------------------
+       MEMORY
+    ------------------------------------------------------- */
+
+    const memoryValue =
+        Number(
+            memory.utilization ?? 0
+        );
+
+
+    document.getElementById(
+        "memory-utilization"
+    ).textContent =
+        formatMetric(
+            memoryValue,
+            "%"
+        );
+
+
+    document.getElementById(
+        "memory-total"
+    ).textContent =
+        formatBytes(
+            memory.total
+        );
+
+
+    document.getElementById(
+        "memory-used"
+    ).textContent =
+        formatBytes(
+            memory.used
+        );
+
+
+    document.getElementById(
+        "memory-available"
+    ).textContent =
+        formatBytes(
+            memory.available
+        );
+
+
+    /* -------------------------------------------------------
+       SNMP MONITORING CARD
+    ------------------------------------------------------- */
+
+    document.getElementById(
+        "snmp-monitoring-status"
+    ).textContent =
+        status;
+
+
+    document.getElementById(
+        "snmp-monitoring-host"
+    ).textContent =
+        snmpHostname;
+
+
+    document.getElementById(
+        "snmp-monitoring-cpu"
+    ).textContent =
+        formatMetric(
+            cpuValue,
+            "%"
+        );
+
+
+    document.getElementById(
+        "snmp-monitoring-memory"
+    ).textContent =
+        formatMetric(
+            memoryValue,
+            "%"
+        );
+
+}
+
+
+/* =========================================================
+   DISK TABLE
+========================================================= */
+
+function updateDiskTable(disks){
+
+    const container =
+        document.getElementById(
+            "disk-table-container"
+        );
+
+
+    if(!container){
+        return;
+    }
+
+
+    if(
+        !Array.isArray(disks) ||
+        disks.length === 0
+    ){
+
+        container.innerHTML =
+            '<div class="no-disk-data">' +
+            'No disk information available.' +
+            '</div>';
+
+        return;
+
+    }
+
+
+    let html =
+        '<table class="disk-table">' +
+
+        '<thead>' +
+
+        '<tr>' +
+
+        '<th>Disk</th>' +
+        '<th>Total</th>' +
+        '<th>Used</th>' +
+        '<th>Available</th>' +
+        '<th>Utilization</th>' +
+        '<th>Last Update</th>' +
+
+        '</tr>' +
+
+        '</thead>' +
+
+        '<tbody>';
+
+
+    disks.forEach(
+        function(disk){
+
+            html +=
+                '<tr>' +
+
+                '<td>' +
+                escapeHtml(
+                    disk.name || "-"
+                ) +
+                '</td>' +
+
+                '<td>' +
+                formatBytes(
+                    disk.total
+                ) +
+                '</td>' +
+
+                '<td>' +
+                formatBytes(
+                    disk.used
+                ) +
+                '</td>' +
+
+                '<td>' +
+                formatBytes(
+                    disk.available
+                ) +
+                '</td>' +
+
+                '<td class="disk-utilization">' +
+                formatMetric(
+                    disk.utilization,
+                    "%"
+                ) +
+                '</td>' +
+
+                '<td>' +
+                escapeHtml(
+                    disk.timestamp || "-"
+                ) +
+                '</td>' +
+
+                '</tr>';
+
+        }
+    );
+
+
+    html +=
+        '</tbody>' +
+        '</table>';
+
+
+    container.innerHTML =
+        html;
+
+}
+
+
+/* =========================================================
+   HTML ESCAPE
+========================================================= */
+
+function escapeHtml(value){
+
+    const div =
+        document.createElement("div");
+
+    div.textContent =
+        value;
+
+    return div.innerHTML;
+}
+
+
+/* =========================================================
+   UPDATE LATENCY CHART
+========================================================= */
+
+function updateLatencyChart(
+    labels,
+    values
+){
+
+    if(!latencyChart){
+        return;
+    }
+
+
+    latencyChart.data.labels =
+        labels;
+
+
+    latencyChart.data.datasets[0].data =
+        values;
+
+
+    latencyChart.update("none");
+
+
+    updateGraphStatistics(
+        values,
+        "latency-current",
+        "latency-average",
+        "latency-minimum",
+        "latency-maximum",
+        " ms"
+    );
+
+}
+
+
+/* =========================================================
+   UPDATE PACKET LOSS CHART
+========================================================= */
+
+function updatePacketLossChart(
+    labels,
+    values
+){
+
+    if(!packetLossChart){
+        return;
+    }
+
+
+    packetLossChart.data.labels =
+        labels;
+
+
+    packetLossChart.data.datasets[0].data =
+        values;
+
+
+    packetLossChart.update("none");
+
+
+    updateGraphStatistics(
+        values,
+        "packet-current",
+        "packet-average",
+        "packet-minimum",
+        "packet-maximum",
+        "%"
+    );
+
+}
+
+
+/* =========================================================
+   UPDATE CPU CHART
+========================================================= */
+
+function updateCpuChart(
+    labels,
+    values
+){
+
+    if(!cpuChart){
+        return;
+    }
+
+
+    cpuChart.data.labels =
+        labels;
+
+
+    cpuChart.data.datasets[0].data =
+        values;
+
+
+    cpuChart.update("none");
+
+
+    updateGraphStatistics(
+        values,
+        "cpu-current",
+        "cpu-average",
+        "cpu-minimum",
+        "cpu-maximum",
+        "%"
+    );
+
+}
+
+
+/* =========================================================
+   UPDATE MEMORY CHART
+========================================================= */
+
+function updateMemoryChart(
+    labels,
+    values
+){
+
+    if(!memoryChart){
+        return;
+    }
+
+
+    memoryChart.data.labels =
+        labels;
+
+
+    memoryChart.data.datasets[0].data =
+        values;
+
+
+    memoryChart.update("none");
+
+
+    updateGraphStatistics(
+        values,
+        "memory-current",
+        "memory-average",
+        "memory-minimum",
+        "memory-maximum",
+        "%"
+    );
+
+}
+
+
+/* =========================================================
+   UPDATE DISK CHART
+========================================================= */
+
+function updateDiskChart(
+    labels,
+    values
+){
+
+    if(!diskChart){
+        return;
+    }
+
+
+    diskChart.data.labels =
+        labels;
+
+
+    diskChart.data.datasets[0].data =
+        values;
+
+
+    diskChart.update("none");
+
+
+    updateGraphStatistics(
+        values,
+        "disk-current",
+        "disk-average",
+        "disk-minimum",
+        "disk-maximum",
+        "%"
+    );
+
+}
+
+
+/* =========================================================
+   UPDATE EVENT TIMELINE
+========================================================= */
+
+function updateEventTimeline(logs){
+
+    if(!Array.isArray(logs)){
+        return;
+    }
+
+
+    const timeline =
+        document.getElementById(
+            "eventTimeline"
+        );
+
+
+    if(!timeline){
+        return;
+    }
+
+
+    if(logs.length === 0){
+
+        timeline.innerHTML =
+            '<div class="no-events">' +
+            'No device events recorded yet.' +
+            '</div>';
+
+        return;
+
+    }
+
+
+    timeline.innerHTML = "";
+
+
+    logs
+    .slice(0,5)
+    .forEach(
+        function(log){
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+            item.className =
+                "timeline-item";
+
+
+            const dot =
+                document.createElement(
+                    "span"
+                );
+
+            dot.className =
+                "timeline-dot";
+
+
+            if(log.status === "Online"){
+
+                dot.classList.add(
+                    "online"
+                );
+
+            }
+            else if(log.status === "Offline"){
+
+                dot.classList.add(
+                    "offline"
+                );
+
+            }
+
+
+            const content =
+                document.createElement(
+                    "div"
+                );
+
+            content.className =
+                "timeline-content";
+
+
+            const top =
+                document.createElement(
+                    "div"
+                );
+
+            top.className =
+                "timeline-top";
+
+
+            const status =
+                document.createElement(
+                    "span"
+                );
+
+            status.className =
+                "timeline-status";
+
+
+            if(log.status === "Online"){
+
+                status.textContent =
+                    "Device Online";
+
+            }
+            else if(log.status === "Offline"){
+
+                status.textContent =
+                    "Device Offline";
+
+            }
+            else{
+
+                status.textContent =
+                    log.status ||
+                    "Status Change";
+
+            }
+
+
+            const time =
+                document.createElement(
+                    "span"
+                );
+
+            time.className =
+                "timeline-time";
+
+
+            time.textContent =
+                log.timestamp || "-";
+
+
+            top.appendChild(status);
+            top.appendChild(time);
+
+
+            const message =
+                document.createElement(
+                    "div"
+                );
+
+            message.className =
+                "timeline-message";
+
+
+            if(log.message){
+
+                message.textContent =
+                    log.message;
+
+            }
+            else if(
+                log.status === "Online"
+            ){
+
+                message.textContent =
+                    "Device became reachable.";
+
+            }
+            else if(
+                log.status === "Offline"
+            ){
+
+                message.textContent =
+                    "Device became unreachable.";
+
+            }
+            else{
+
+                message.textContent =
+                    "Device status changed.";
+
+            }
+
+
+            content.appendChild(top);
+            content.appendChild(message);
+
+
+            item.appendChild(dot);
+            item.appendChild(content);
+
+
+            timeline.appendChild(item);
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   LIVE DEVICE UPDATE
+========================================================= */
+
+async function updateDeviceDetails(){
+
+    try{
+
+        const response =
+            await fetch(
+                deviceApiUrl,
+                {
+                    method:"GET",
+
+                    cache:"no-store",
+
+                    headers:{
+                        "X-Requested-With":
+                            "XMLHttpRequest"
+                    }
+                }
+            );
+
+
+        if(!response.ok){
+
+            console.error(
+                "Device API error:",
+                response.status
+            );
+
+            return;
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        /*
+           Update normal device information.
+        */
+
+        updateDeviceInformation(
+            data
+        );
+
+
+        /*
+           Update SNMP information.
+
+           This also updates BOTH hostname
+           fields and formats SNMP uptime.
+        */
+
+        updateSNMPInformation(
+            data
+        );
+
+
+        /*
+           Disk table.
+        */
+
+        updateDiskTable(
+            data.disks || []
+        );
+
+
+        /*
+           Network charts.
+        */
+
+        if(data.latency){
+
+            updateLatencyChart(
+                data.latency.labels || [],
+                data.latency.values || []
+            );
+
+        }
+
+
+        if(data.packet_loss){
+
+            updatePacketLossChart(
+                data.packet_loss.labels || [],
+                data.packet_loss.values || []
+            );
+
+        }
+
+
+        /*
+           SNMP charts.
+        */
+
+        if(data.cpu_history){
+
+            updateCpuChart(
+                data.cpu_history.labels || [],
+                data.cpu_history.values || []
+            );
+
+        }
+
+
+        if(data.memory_history){
+
+            updateMemoryChart(
+                data.memory_history.labels || [],
+                data.memory_history.values || []
+            );
+
+        }
+
+
+        if(data.disk_history){
+
+            updateDiskChart(
+                data.disk_history.labels || [],
+                data.disk_history.values || []
+            );
+
+        }
+
+
+        /*
+           Event timeline.
+        */
+
+        if(Array.isArray(data.logs)){
+
+            updateEventTimeline(
+                data.logs
+            );
+
+        }
+
+    }
+    catch(error){
+
+        console.error(
+            "Live update failed:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   START LIVE MONITORING
+========================================================= */
+
+updateDeviceDetails();
+
+
+setInterval(
+    updateDeviceDetails,
+    2000
+);
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,5 @@
+Django==4.2.30
+websockets
+mss
+Pillow
+django-apscheduler
