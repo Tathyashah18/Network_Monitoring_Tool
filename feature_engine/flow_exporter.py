@@ -10,9 +10,11 @@ from .feature_extractor import extract_features
 class FlowExporter:
 
     def __init__(self, output_path=None):
+
         self.output_path = Path(
-            output_path if output_path else
-            FEATURE_DIR / "nmt_flow_features.csv"
+            output_path
+            if output_path
+            else FEATURE_DIR / "nmt_flow_features.csv"
         )
 
         self.output_path.parent.mkdir(
@@ -20,10 +22,30 @@ class FlowExporter:
             exist_ok=True
         )
 
-        self.file_exists = (
+        file_exists = (
             self.output_path.exists()
             and self.output_path.stat().st_size > 0
         )
+
+        if file_exists:
+            with open(
+                self.output_path,
+                mode="r",
+                newline="",
+                encoding="utf-8-sig"
+            ) as existing_file:
+
+                existing_header = next(
+                    csv.reader(existing_file),
+                    None
+                )
+
+            if existing_header != CSV_COLUMNS:
+                raise ValueError(
+                    "Existing CSV header does not match the "
+                    "current feature schema. Use a different "
+                    "output filename or resolve the schema mismatch."
+                )
 
         self.file = open(
             self.output_path,
@@ -37,12 +59,14 @@ class FlowExporter:
             fieldnames=CSV_COLUMNS
         )
 
-        if not self.file_exists:
+        if not file_exists:
             self.writer.writeheader()
             self.file.flush()
 
+        self.exported_count = 0
+
     def export_flow(self, flow):
-        """Extract features and append one flow to the CSV."""
+        """Extract features and append one completed flow."""
 
         features = extract_features(flow)
 
@@ -58,7 +82,11 @@ class FlowExporter:
         row.update(features)
 
         self.writer.writerow(row)
+
+        # Make the record visible in the CSV immediately.
         self.file.flush()
+
+        self.exported_count += 1
 
         return row
 
@@ -68,12 +96,14 @@ class FlowExporter:
         exported = []
 
         for flow in flows:
-            exported.append(self.export_flow(flow))
+            exported.append(
+                self.export_flow(flow)
+            )
 
         return exported
 
     def close(self):
-        """Close the CSV file safely."""
+        """Flush and safely close the CSV."""
 
         if not self.file.closed:
             self.file.flush()

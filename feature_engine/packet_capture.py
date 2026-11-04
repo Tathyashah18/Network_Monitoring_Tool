@@ -1,5 +1,7 @@
 
 from pathlib import Path
+import time
+
 from scapy.all import sniff, PcapReader, conf
 
 
@@ -15,49 +17,84 @@ def list_interfaces():
         )
 
 
-def capture_live(interface, callback, duration=None, packet_filter=None):
+def capture_live(
+    interface,
+    callback,
+    duration=None,
+    packet_filter=None,
+    idle_callback=None,
+):
     """
-    Capture live packets from a selected interface.
+    Capture live packets.
 
-    interface: Scapy interface name or identifier
-    callback: function called for every captured packet
-    duration: capture duration in seconds, None means continuous
-    packet_filter: optional BPF filter
+    duration=None means continuous capture.
+    idle_callback runs approximately once per second.
     """
+
     print(f"\nStarting live capture on: {interface}")
+    print("Press CTRL+C to stop safely.")
+
+    start_time = time.monotonic()
+    packet_count = 0
 
     try:
-        sniff(
-            iface=interface,
-            prn=callback,
-            store=False,
-            timeout=duration,
-            filter=packet_filter
-        )
-    except PermissionError:
+        while True:
+            if duration is None:
+                timeout = 1
+            else:
+                remaining = duration - (
+                    time.monotonic() - start_time
+                )
+
+                if remaining <= 0:
+                    break
+
+                timeout = min(1, remaining)
+
+            captured = sniff(
+                iface=interface,
+                prn=callback,
+                store=False,
+                timeout=timeout,
+                filter=packet_filter,
+            )
+
+            packet_count += len(captured)
+
+            if idle_callback is not None:
+                idle_callback()
+
+    except KeyboardInterrupt:
+        print("\nLive capture stopped by user.")
+
+    except PermissionError as error:
         raise RuntimeError(
             "Permission denied. Run PowerShell as Administrator."
-        )
-    except OSError as error:
+        ) from error
+
+    except Exception as error:
         raise RuntimeError(
             f"Live capture failed: {error}. "
-            "Check that Npcap is installed and the interface is valid."
-        )
+            "Check Npcap and the selected interface."
+        ) from error
 
-    print("Live capture completed.")
+    print(f"Live packets captured: {packet_count}")
 
 
 def read_pcap(file_path, callback):
-    """
-    Read packets from an existing PCAP or PCAPNG file.
-    """
+    """Read packets from an existing PCAP or PCAPNG file."""
+
     path = Path(file_path)
 
     if not path.exists():
-        raise FileNotFoundError(f"Capture file not found: {path}")
+        raise FileNotFoundError(
+            f"Capture file not found: {path}"
+        )
 
     if not path.is_file():
-        raise ValueError(f"Capture path is not a file: {path}")
+        raise ValueError(
+            f"Capture path is not a file: {path}"
+        )
 
     packet_count = 0
 

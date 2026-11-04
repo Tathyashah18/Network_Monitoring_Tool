@@ -22,12 +22,7 @@ def safe_min(values):
 
 
 def calculate_iat(timestamps):
-    """Calculate inter-arrival times in microseconds."""
-    if len(timestamps) < 2:
-        return []
-
     ordered = sorted(timestamps)
-
     return [
         (ordered[i] - ordered[i - 1]) * 1_000_000
         for i in range(1, len(ordered))
@@ -35,16 +30,56 @@ def calculate_iat(timestamps):
 
 
 def calculate_active_periods(timestamps):
-    """
-    Estimate active periods using the configured idle timeout.
-    Returns active durations in microseconds.
-    """
     if not timestamps:
         return []
 
     ordered = sorted(timestamps)
-    active_periods = []
+    periods = []
+    period_start = ordered[0]
+    previous = ordered[0]
 
+    for timestamp in ordered[1:]:
+        if timestamp - previous > ACTIVE_TIMEOUT_SECONDS:
+            periods.append((previous - period_start) * 1_000_000)
+            period_start = timestamp
+
+        previous = timestamp
+
+    periods.append((previous - period_start) * 1_000_000)
+    return periods
+
+
+def calculate_subflow_packets(timestamps):
+    if not timestamps:
+        return 0.0
+
+    ordered = sorted(timestamps)
+    interval_counts = {}
+
+    for timestamp in ordered:
+        interval = int(
+            (timestamp - ordered[0]) // SUBFLOW_INTERVAL_SECONDS
+        )
+        interval_counts[interval] = interval_counts.get(interval, 0) + 1
+
+    return safe_mean(list(interval_counts.values()))
+
+
+def calculate_average_packet_size(packet_lengths):
+    if not packet_lengths:
+        return 0.0
+
+    return (
+        sum(packet_lengths) + len(packet_lengths)
+    ) / len(packet_lengths)
+
+
+def calculate_active_mean(timestamps):
+    if len(timestamps) < 2:
+        return 0.0
+
+    ordered = sorted(timestamps)
+    active_periods = []
     period_start = ordered[0]
     previous = ordered[0]
 
@@ -63,53 +98,18 @@ def calculate_active_periods(timestamps):
         (previous - period_start) * 1_000_000
     )
 
-    return active_periods
-
-
-def calculate_subflow_packets(timestamps):
-    """
-    Approximate average packets per occupied time interval.
-    This is not an exact CICFlowMeter subflow implementation.
-    """
-    if not timestamps:
-        return 0.0
-
-    interval_counts = {}
-
-    for timestamp in timestamps:
-        interval = int(
-            (timestamp - timestamps[0]) // SUBFLOW_INTERVAL_SECONDS
-        )
-        interval_counts[interval] = interval_counts.get(interval, 0) + 1
-
-    return safe_mean(list(interval_counts.values()))
+    return safe_mean(active_periods)
 
 
 def extract_features(flow):
-    """Calculate the configured 30 features for a Flow object."""
-
     fwd = flow.fwd_lengths
     bwd = flow.bwd_lengths
     all_lengths = flow.packet_lengths
 
-    fwd_timestamps = [
-        timestamp
-        for timestamp, direction in zip(
-            flow.timestamps, flow.directions
-        )
-        if direction == 0
-    ]
-
-    bwd_timestamps = [
-        timestamp
-        for timestamp, direction in zip(
-            flow.timestamps, flow.directions
-        )
-        if direction == 1
-    ]
+    fwd_timestamps = flow.fwd_timestamps
+    bwd_timestamps = flow.bwd_timestamps
 
     duration_seconds = max(0.0, flow.duration)
-
     duration_microseconds = duration_seconds * 1_000_000
 
     total_bytes = sum(all_lengths)
@@ -128,8 +128,6 @@ def extract_features(flow):
     flow_iat = calculate_iat(flow.timestamps)
     fwd_iat = calculate_iat(fwd_timestamps)
     bwd_iat = calculate_iat(bwd_timestamps)
-
-    active_periods = calculate_active_periods(flow.timestamps)
 
     down_up_ratio = (
         len(bwd) / len(fwd)
@@ -174,25 +172,19 @@ def extract_features(flow):
 
         "Down/Up Ratio": down_up_ratio,
 
-        "Average Packet Size": safe_mean(all_lengths),
+        "Average Packet Size": calculate_average_packet_size(all_lengths),
 
-        "Subflow Fwd Packets": calculate_subflow_packets(
-            fwd_timestamps
-        ),
-        "Subflow Bwd Packets": calculate_subflow_packets(
-            bwd_timestamps
-        ),
+        "Subflow Fwd Packets": calculate_subflow_packets(fwd_timestamps),
+        "Subflow Bwd Packets": calculate_subflow_packets(bwd_timestamps),
 
-        "Active Mean": safe_mean(active_periods),
+        "Active Mean": calculate_active_mean(flow.timestamps),
     }
 
-    # Enforce exact feature ordering and schema.
     ordered_features = {
         column: float(features[column])
         for column in FEATURE_COLUMNS
     }
 
-    # Prevent NaN and infinite values from entering the dataset.
     for name, value in ordered_features.items():
         if not math.isfinite(value):
             ordered_features[name] = 0.0

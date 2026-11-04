@@ -1,4 +1,6 @@
+
 from dataclasses import dataclass, field
+from typing import Optional
 import ipaddress
 
 from scapy.all import IP, IPv6, TCP, UDP, ICMP
@@ -17,10 +19,10 @@ class Flow:
 
     packet_lengths: list = field(default_factory=list)
     timestamps: list = field(default_factory=list)
+    directions: list = field(default_factory=list)
 
     fwd_lengths: list = field(default_factory=list)
     bwd_lengths: list = field(default_factory=list)
-
     fwd_timestamps: list = field(default_factory=list)
     bwd_timestamps: list = field(default_factory=list)
 
@@ -31,11 +33,13 @@ class Flow:
     psh_count: int = 0
     urg_count: int = 0
 
-    def add_packet(self, timestamp, length, direction, tcp_flags=None):
-        self.last_time = timestamp
+    def add_packet(self, timestamp: float, length: int,
+                   direction: int, tcp_flags: Optional[int] = None):
 
+        self.last_time = timestamp
         self.packet_lengths.append(length)
         self.timestamps.append(timestamp)
+        self.directions.append(direction)
 
         if direction == 0:
             self.fwd_lengths.append(length)
@@ -68,7 +72,11 @@ class FlowManager:
         self.flow_timeout = float(flow_timeout)
 
     @staticmethod
-    def _packet_details(packet):
+    def _normalise_ip(ip):
+        return str(ipaddress.ip_address(ip))
+
+    @staticmethod
+    def _get_packet_details(packet):
         if IP in packet:
             ip_layer = packet[IP]
             src_ip = ip_layer.src
@@ -107,48 +115,39 @@ class FlowManager:
             protocol = 1
 
         return {
-            "src_ip": str(ipaddress.ip_address(src_ip)),
-            "dst_ip": str(ipaddress.ip_address(dst_ip)),
+            "src_ip": FlowManager._normalise_ip(src_ip),
+            "dst_ip": FlowManager._normalise_ip(dst_ip),
             "src_port": src_port,
             "dst_port": dst_port,
             "protocol": protocol,
             "length": length,
             "tcp_flags": tcp_flags,
-            "timestamp": float(packet.time),
+            "timestamp": float(packet.time)
         }
 
     @staticmethod
     def _make_flow_key(details):
-        endpoint_a = (
-            details["src_ip"],
-            details["src_port"],
+        endpoint_a = (details["src_ip"], details["src_port"])
+        endpoint_b = (details["dst_ip"], details["dst_port"])
+
+        return (
+            details["protocol"],
+            tuple(sorted((endpoint_a, endpoint_b)))
         )
-
-        endpoint_b = (
-            details["dst_ip"],
-            details["dst_port"],
-        )
-
-        endpoints = tuple(sorted((endpoint_a, endpoint_b)))
-
-        return details["protocol"], endpoints
 
     def process_packet(self, packet):
-        details = self._packet_details(packet)
+        details = self._get_packet_details(packet)
 
         if details is None:
             return None
 
-        timestamp = details["timestamp"]
         key = self._make_flow_key(details)
-
+        timestamp = details["timestamp"]
         flow = self.flows.get(key)
 
-        # A flow starts a new window after an idle timeout.
-        if flow is not None:
-            if timestamp - flow.last_time > self.flow_timeout:
-                del self.flows[key]
-                flow = None
+        if flow is not None and timestamp - flow.last_time > self.flow_timeout:
+            del self.flows[key]
+            flow = None
 
         if flow is None:
             flow = Flow(
@@ -159,7 +158,7 @@ class FlowManager:
                 dst_port=details["dst_port"],
                 protocol=details["protocol"],
                 start_time=timestamp,
-                last_time=timestamp,
+                last_time=timestamp
             )
             self.flows[key] = flow
 
@@ -172,7 +171,7 @@ class FlowManager:
             timestamp=timestamp,
             length=details["length"],
             direction=direction,
-            tcp_flags=details["tcp_flags"],
+            tcp_flags=details["tcp_flags"]
         )
 
         return flow

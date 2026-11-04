@@ -1,6 +1,7 @@
 
 import argparse
 import logging
+import time
 from pathlib import Path
 
 from .config import FLOW_TIMEOUT_SECONDS, DEFAULT_OUTPUT
@@ -24,6 +25,7 @@ logger = logging.getLogger("NMT-Feature-Engine")
 class FeatureEngine:
 
     def __init__(self, output_path):
+
         self.flow_manager = FlowManager(
             flow_timeout=FLOW_TIMEOUT_SECONDS
         )
@@ -32,16 +34,22 @@ class FeatureEngine:
 
         self.packet_count = 0
         self.exported_flow_count = 0
+        self.processing_errors = 0
+        self.finished = False
+
+        logger.info(
+            "CSV output: %s",
+            self.exporter.output_path.resolve()
+        )
 
     def process_packet(self, packet):
-        """Process one packet and export expired flows."""
+        """Process a captured packet."""
 
         self.packet_count += 1
 
         try:
             timestamp = float(packet.time)
 
-            # Export expired flows before processing the new packet.
             expired_flows = self.flow_manager.get_expired_flows(
                 timestamp
             )
@@ -52,13 +60,27 @@ class FeatureEngine:
             self.flow_manager.process_packet(packet)
 
         except Exception:
+            self.processing_errors += 1
+
             logger.exception(
                 "Error processing packet number %d",
                 self.packet_count,
             )
 
+    def expire_idle_flows(self):
+        """Expire flows even when no packets arrive."""
+
+        current_time = time.time()
+
+        expired_flows = self.flow_manager.get_expired_flows(
+            current_time
+        )
+
+        if expired_flows:
+            self.export_flows(expired_flows)
+
     def export_flows(self, flows):
-        """Calculate features and export flows."""
+        """Extract features and append completed flows."""
 
         for flow in flows:
             try:
@@ -71,8 +93,20 @@ class FeatureEngine:
                     flow.flow_id,
                 )
 
+        if flows:
+            logger.info(
+                "Flows exported: %d | Total exported: %d",
+                len(flows),
+                self.exported_flow_count,
+            )
+
     def finish(self):
-        """Export remaining flows and close the CSV."""
+        """Export remaining flows and close the CSV safely."""
+
+        if self.finished:
+            return
+
+        self.finished = True
 
         try:
             remaining_flows = self.flow_manager.flush_all()
@@ -85,11 +119,17 @@ class FeatureEngine:
 
         logger.info("Capture processing completed")
         logger.info("Packets processed: %d", self.packet_count)
-        logger.info("Flows exported: %d", self.exported_flow_count)
+        logger.info(
+            "Flows exported: %d",
+            self.exported_flow_count
+        )
+        logger.info(
+            "Packet processing errors: %d",
+            self.processing_errors
+        )
 
 
 def run_pcap(input_path, output_path):
-    """Extract features from an existing capture file."""
 
     engine = FeatureEngine(output_path)
 
@@ -104,7 +144,6 @@ def run_pcap(input_path, output_path):
 
 
 def run_live(interface, duration, output_path, packet_filter=None):
-    """Extract features from live network traffic."""
 
     engine = FeatureEngine(output_path)
 
@@ -114,6 +153,7 @@ def run_live(interface, duration, output_path, packet_filter=None):
             callback=engine.process_packet,
             duration=duration,
             packet_filter=packet_filter,
+            idle_callback=engine.expire_idle_flows,
         )
 
     finally:
@@ -121,6 +161,7 @@ def run_live(interface, duration, output_path, packet_filter=None):
 
 
 def build_parser():
+
     parser = argparse.ArgumentParser(
         description="NMT Network Flow Feature Extraction Engine"
     )
@@ -129,7 +170,7 @@ def build_parser():
         "--mode",
         choices=["interfaces", "pcap", "live"],
         required=True,
-        help="Select interface listing, PCAP processing or live capture",
+        help="Interface listing, PCAP processing or live capture",
     )
 
     parser.add_argument(
@@ -147,8 +188,8 @@ def build_parser():
     parser.add_argument(
         "--duration",
         type=int,
-        default=60,
-        help="Live capture duration in seconds (default: 60)",
+        default=0,
+        help="Capture duration in seconds. 0 means continuous.",
     )
 
     parser.add_argument(
@@ -169,6 +210,7 @@ def build_parser():
 
 
 def main():
+
     parser = build_parser()
     args = parser.parse_args()
 
@@ -179,6 +221,7 @@ def main():
         return
 
     if args.mode == "pcap":
+
         if not args.input:
             parser.error("--input is required for PCAP mode")
 
@@ -188,15 +231,21 @@ def main():
         )
 
     elif args.mode == "live":
+
         if not args.interface:
             parser.error("--interface is required for live mode")
 
-        if args.duration <= 0:
-            parser.error("--duration must be greater than zero")
+        if args.duration < 0:
+            parser.error("--duration cannot be negative")
+
+        duration = (
+            None if args.duration == 0
+            else args.duration
+        )
 
         run_live(
             interface=args.interface,
-            duration=args.duration,
+            duration=duration,
             output_path=output_path,
             packet_filter=args.filter,
         )
