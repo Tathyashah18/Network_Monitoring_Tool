@@ -4,6 +4,6 @@ mss
 Pillow
 django-apscheduler
 pysnmp==7.1.21
-scapy  
-numpy
-pandas
+scapy==2.8.0
+pandas==2.2.3
+numpy==1.26.4
