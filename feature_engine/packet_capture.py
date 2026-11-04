@@ -1,12 +1,14 @@
 
 from pathlib import Path
+import queue
 import time
 
-from scapy.all import sniff, PcapReader, conf
+from scapy.all import AsyncSniffer, PcapReader, conf
 
 
 def list_interfaces():
     """Display network interfaces recognised by Scapy."""
+
     print("\nAvailable network interfaces:\n")
 
     for interface in conf.ifaces.values():
@@ -25,60 +27,81 @@ def capture_live(
     idle_callback=None,
 ):
     """
-    Capture live packets.
+    Capture packets in a background thread.
 
-    duration=None means continuous capture.
-    idle_callback runs approximately once per second.
+    A thread-safe queue transfers packets to the main thread.
+    The callback and idle_callback execute only in the main thread.
     """
 
     print(f"\nStarting live capture on: {interface}")
     print("Press CTRL+C to stop safely.")
 
+    packet_queue = queue.Queue()
+
+    sniffer = AsyncSniffer(
+        iface=interface,
+        prn=packet_queue.put,
+        store=False,
+        filter=packet_filter,
+    )
+
+    started = False
     start_time = time.monotonic()
-    packet_count = 0
+
+    def process_queued_packets():
+        """Process all packets currently waiting in the queue."""
+
+        processed = 0
+
+        while True:
+            try:
+                packet = packet_queue.get_nowait()
+            except queue.Empty:
+                break
+
+            callback(packet)
+            processed += 1
+
+        return processed
 
     try:
+        sniffer.start()
+        started = True
+
         while True:
-            if duration is None:
-                timeout = 1
-            else:
-                remaining = duration - (
-                    time.monotonic() - start_time
-                )
 
-                if remaining <= 0:
-                    break
+            # Process packets in the main thread.
+            process_queued_packets()
 
-                timeout = min(1, remaining)
-
-            captured = sniff(
-                iface=interface,
-                prn=callback,
-                store=False,
-                timeout=timeout,
-                filter=packet_filter,
-            )
-
-            packet_count += len(captured)
-
+            # Expire idle flows only after draining the queue.
             if idle_callback is not None:
                 idle_callback()
+
+            if duration is not None:
+                elapsed = time.monotonic() - start_time
+
+                if elapsed >= duration:
+                    break
+
+            time.sleep(0.1)
 
     except KeyboardInterrupt:
         print("\nLive capture stopped by user.")
 
-    except PermissionError as error:
-        raise RuntimeError(
-            "Permission denied. Run PowerShell as Administrator."
-        ) from error
+    finally:
 
-    except Exception as error:
-        raise RuntimeError(
-            f"Live capture failed: {error}. "
-            "Check Npcap and the selected interface."
-        ) from error
+        if started:
+            try:
+                if sniffer.running:
+                    sniffer.stop()
 
-    print(f"Live packets captured: {packet_count}")
+                sniffer.join()
+
+            finally:
+                # Process packets captured before shutdown.
+                process_queued_packets()
+
+    print("Live capture session closed.")
 
 
 def read_pcap(file_path, callback):
