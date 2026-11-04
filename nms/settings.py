@@ -31,8 +31,6 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
-    'dashboard',
-    "snmp_monitoring",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     "django_apscheduler",
     'django.contrib.staticfiles',
+    'dashboard',
+    "snmp_monitoring",
 ]
 
 MIDDLEWARE = [

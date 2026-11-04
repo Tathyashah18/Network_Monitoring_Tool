@@ -3,3 +3,4 @@ websockets
 mss
 Pillow
 django-apscheduler
+pysnmp==7.1.21

@@ -35,6 +35,7 @@ SNMP_RETRIES = 1
 # It will get IP addresses from the Device table.
 
 TEST_IPS = [
+    "192.168.29.124"
     "192.168.1.105",
     "192.168.1.100",
     "192.168.1.107",
