@@ -1,6 +1,6 @@
 
 from pathlib import Path
-import queue
+from queue import Queue, Empty
 import time
 
 from scapy.all import AsyncSniffer, PcapReader, conf
@@ -27,17 +27,21 @@ def capture_live(
     idle_callback=None,
 ):
     """
-    Capture packets in a background thread.
+    Capture packets in a background thread and process them
+    sequentially in the calling thread.
 
-    A thread-safe queue transfers packets to the main thread.
-    The callback and idle_callback execute only in the main thread.
+    The capture thread only places packets into a thread-safe queue.
+    The calling thread processes packets and expires idle flows.
+
+    duration=None means continuous capture.
     """
 
     print(f"\nStarting live capture on: {interface}")
     print("Press CTRL+C to stop safely.")
 
-    packet_queue = queue.Queue()
+    packet_queue = Queue()
 
+    # The capture thread only enqueues packets.
     sniffer = AsyncSniffer(
         iface=interface,
         prn=packet_queue.put,
@@ -47,6 +51,7 @@ def capture_live(
 
     started = False
     start_time = time.monotonic()
+    last_status_time = start_time
 
     def process_queued_packets():
         """Process all packets currently waiting in the queue."""
@@ -56,11 +61,14 @@ def capture_live(
         while True:
             try:
                 packet = packet_queue.get_nowait()
-            except queue.Empty:
+            except Empty:
                 break
 
-            callback(packet)
-            processed += 1
+            try:
+                callback(packet)
+                processed += 1
+            finally:
+                packet_queue.task_done()
 
         return processed
 
@@ -70,36 +78,58 @@ def capture_live(
 
         while True:
 
-            # Process packets in the main thread.
-            process_queued_packets()
-
-            # Expire idle flows only after draining the queue.
-            if idle_callback is not None:
-                idle_callback()
-
             if duration is not None:
                 elapsed = time.monotonic() - start_time
 
                 if elapsed >= duration:
                     break
 
-            time.sleep(0.1)
+            # Wait briefly for a packet.
+            try:
+                packet = packet_queue.get(timeout=0.25)
+
+                try:
+                    callback(packet)
+                finally:
+                    packet_queue.task_done()
+
+            except Empty:
+                pass
+
+            # Process any additional packets already queued.
+            process_queued_packets()
+
+            # Flow expiration happens in this same thread.
+            if idle_callback is not None:
+                idle_callback()
+
+            # Report queue backlog periodically.
+            current_time = time.monotonic()
+
+            if current_time - last_status_time >= 10:
+                logger_backlog = packet_queue.qsize()
+
+                print(
+                    f"Capture running | "
+                    f"Queued packets: {logger_backlog}"
+                )
+
+                last_status_time = current_time
 
     except KeyboardInterrupt:
         print("\nLive capture stopped by user.")
 
     finally:
 
-        if started:
-            try:
-                if sniffer.running:
-                    sniffer.stop()
+        # Stop packet reception before draining the queue.
+        if started and sniffer.running:
+            sniffer.stop(join=True)
 
-                sniffer.join()
+        # Process all packets captured before shutdown.
+        process_queued_packets()
 
-            finally:
-                # Process packets captured before shutdown.
-                process_queued_packets()
+        if idle_callback is not None:
+            idle_callback()
 
     print("Live capture session closed.")
 
