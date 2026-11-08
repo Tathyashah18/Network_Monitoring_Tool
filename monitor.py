@@ -168,7 +168,8 @@ def start_monitor():
         print("[MONITOR] Background thread started.")
 
 def stop_monitor():
-    _stop_event.set()
+    _stop_event.set()  
+    
     if _monitor_thread and _monitor_thread.is_alive():
         _monitor_thread.join(timeout=10)
 
